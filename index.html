@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calculadora de Orçamento – Multi‑pacotes (1–6) + Serviços (7)</title>
+  <title>Calculadora de Orçamento – Multi-pacotes (1–6) + Serviços (7)</title>
   <style>
     :root { --accent:#111; --muted:#5f6368; --line:#dcdfe3; --head:#f3f4f6; --zebra:#fbfbfc; }
     * { box-sizing: border-box; }
@@ -61,7 +61,7 @@
     tfoot td { font-weight:bold; background:#fafafa; }
     .muted { color:var(--muted); font-size:11px; }
 
-    .orc-item { border:1px solid var(--line); padding:10px; margin: 10px 0; background:#fff; position:relative; break-inside:auto; }
+    .orc-item { border:1px solid var(--line); padding:10px; margin: 10px 0; background:#fff; position:relative; }
     .orc-item h4 { margin:0 0 8px 0; font-size:13px; letter-spacing:.2px; }
     .rm { position:absolute; top:8px; right:8px; font-size:12px; padding:4px 8px; border:1px solid #ccc; background:#fff; cursor:pointer; border-radius:4px; }
 
@@ -69,20 +69,28 @@
 
     .doc-footer { border-top:1px solid var(--line); padding-top:8px; margin-top:10px; font-size:11px; color:#555; text-align:center; }
 
-    /* ===== PDF multipágina estável ===== */
+    /* ===== Regras de quebra — NÃO dividir .orc-item ===== */
+    .orc-item,
+    .orc-item table,
+    .orc-item thead,
+    .orc-item tbody,
+    .orc-item tfoot,
+    .orc-item tr,
+    .orc-item td,
+    .orc-item th {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    /* Cabeçalhos/rodapés de tabela por página no print */
     thead { display: table-header-group; }
     tfoot { display: table-footer-group; }
-    table, tr, td, th, .doc-header, .kv { page-break-inside: auto; break-inside: auto; }
 
+    /* @page e modo de impressão */
     @page { size: A4; margin: 10mm; }
     @media print {
       header, .controls, .pager { display:none !important; }
       .rm { display:none !important; }
-      body { background:#fff; }
-      .a4 { width:auto; height:auto; overflow:visible; border:0; padding:10mm; }
-      .orc-item { border:1px solid #e5e7eb; }
-      .doc-obs { border-color:#d1d5db; }
-    }
       body { background:#fff; }
       .a4 { width:auto; height:auto; overflow:visible; border:0; padding:10mm; }
       .orc-item { border:1px solid #e5e7eb; }
@@ -97,8 +105,8 @@
       <img id="pdfLogo2" alt="Logo adicional" />
     </div>
     <div class="header-text">
-      <h1>Calculadora de Orçamento – Multi‑pacotes</h1>
-      <div class="sub">Pré‑visualização A4 com paginação. Pacotes 1–6 empilhados + Serviços (7) separado. Logo 1 (BASE64) + Logo 2 (upload).</div>
+      <h1>Calculadora de Orçamento – Multi-pacotes</h1>
+      <div class="sub">Pré-visualização A4 com paginação. Pacotes 1–6 empilhados + Serviços (7) separado. Logo 1 (BASE64) + Logo 2 (upload).</div>
     </div>
   </header>
 
@@ -171,11 +179,10 @@
           <textarea id="obsDoc" placeholder="Texto único usado no final do PDF, independentemente da quantidade de pacotes adicionados."></textarea>
 
           <div class="btns">
+            <!-- ÚNICO botão mantido -->
+            <button id="btnPrintAll" class="ghost">Salvar PDF (navegador)</button>
             <button id="btnAddItem">Adicionar pacote</button>
             <button id="btnClearItems" class="soft">Limpar lista</button>
-            <button id="btnPrintAll" class="ghost">Imprimir/Salvar PDF (vetorial – recomendado)</button>
-            <button id="btnVectorAll" class="ghost">Baixar PDF (vetorial – jsPDF)</button>
-            <button id="btnPDFall" class="secondary">Baixar PDF (imagem – compatível)</button>
           </div>
         </div>
 
@@ -203,7 +210,7 @@
               <div id="items"></div>
               <div style="margin-top:8px"><strong>Descrição / Observações gerais:</strong></div>
               <div id="obsDocPreview" class="doc-obs"></div>
-              <div class="doc-footer">KCM Audiovisual • Emerson Mas • Contato: (83) 99689‑3360</div>
+              <div class="doc-footer">KCM Audiovisual • Emerson Mas • Contato: (83) 99689-3360</div>
             </div>
           </div>
           <div class="pager" id="pager-principal">
@@ -262,10 +269,9 @@
           <textarea id="obs7" placeholder="Prazos, condições, escopo adicional, etc."></textarea>
 
           <div class="btns">
-            <button id="btnAtualizar7">Atualizar</button>
-            <button id="btnPrint7" class="ghost">Imprimir/Salvar PDF (vetorial – recomendado)</button>
-            <button id="btnVector7" class="ghost">Baixar PDF (vetorial – jsPDF)</button>
-            <button id="btnPDF7" class="secondary">Baixar PDF (imagem – compatível)</button>
+            <!-- ÚNICO botão mantido -->
+            <button id="btnPrint7" class="ghost">Salvar PDF (navegador)</button>
+            <button id="btnAtualizar7">Atualizar prévia</button>
           </div>
         </div>
 
@@ -303,7 +309,7 @@
                 </tfoot>
               </table>
               <p class="muted" id="obsLinha7" style="margin-top:10px"></p>
-              <div class="doc-footer">KCM Audiovisual • Emerson Mas • Contato: (83) 99689‑3360</div>
+              <div class="doc-footer">KCM Audiovisual • Emerson Mas • Contato: (83) 99689-3360</div>
             </div>
           </div>
           <div class="pager" id="pager-servicos">
@@ -316,82 +322,28 @@
     </section>
   </main>
 
-  <!-- libs: html2pdf e jsPDF + helpers (sem duplicações) -->
   <script>
-    function ensureHtml2pdf() {
-      return new Promise((resolve) => {
-        if (window.html2pdf) return resolve();
-        const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        s.onload = () => resolve();
-        s.onerror = () => {
-          const s2 = document.createElement('script');
-          s2.src = 'https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js';
-          s2.onload = () => resolve();
-          s2.onerror = () => { alert('Não foi possível carregar a biblioteca de PDF (imagem).'); };
-          document.body.appendChild(s2);
-        };
-        document.body.appendChild(s);
-      });
-    }
-    function ensureJsPDF() {
-      return new Promise((resolve) => {
-        if (window.jspdf && window.jspdf.jsPDF) return resolve();
-        const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-        s.onload = () => resolve();
-        s.onerror = () => {
-          const s2 = document.createElement('script');
-          s2.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
-          s2.onload = () => resolve();
-          s2.onerror = () => { alert('Não foi possível carregar a biblioteca de PDF (vetorial).'); };
-          document.body.appendChild(s2);
-        };
-        document.body.appendChild(s);
-      });
-    }
-    function ensureHtml2Canvas() {
-      return new Promise((resolve) => {
-        if (window.html2canvas) return resolve();
-        const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-        s.onload = () => resolve();
-        s.onerror = () => {
-          const s2 = document.createElement('script');
-          s2.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-          s2.onload = () => resolve();
-          s2.onerror = () => {
-            const s3 = document.createElement('script');
-            s3.src = 'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js';
-            s3.onload = () => resolve();
-            s3.onerror = () => { alert('Não foi possível carregar o html2canvas (necessário para o PDF vetorial).'); };
-            document.body.appendChild(s3);
-          };
-          document.body.appendChild(s2);
-        };
-        document.body.appendChild(s);
-      });
-    }
-    function waitForImages(root) {
-      const imgs = Array.from(root.querySelectorAll('img'));
-      if (imgs.length === 0) return Promise.resolve();
-      return Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = res; })));
-    }
-  </script>
+    // Utilidades
+    const el = (id) => document.getElementById(id);
+    const fmt = (v) => {
+      const n = Number(v) || 0;
+      try {
+        return new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(n);
+      } catch {
+        return 'R$ ' + n.toFixed(2).replace('.', ',');
+      }
+    };
 
-  <script>
-    // ====== Vetorial nativo via IFRAME oculto (sem pop‑up, mesma formatação da prévia) ======
+    // Impressão nativa (melhor para quebras)
     function printAsVectorIframe(node, title) {
       const styleTag = document.querySelector('head style');
       const css = styleTag ? styleTag.innerHTML : '';
-      // Clona o conteúdo do A4 e remove scroll/altura fixa para imprimir tudo
       const clone = node.cloneNode(true);
       clone.style.height = 'auto';
       clone.style.overflow = 'visible';
 
       const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>${title}</title><style>${css}
-@page{size:A4;margin:10mm;}@media print{header,.controls,.pager{display:none!important}body{background:#fff}.a4{width:auto;height:auto;overflow:visible;border:0;padding:10mm}}
-</style></head><body>${clone.outerHTML}</body></html>`;
+@page{size:A4;margin:10mm;}@media print{header,.controls,.pager{display:none!important}body{background:#fff}.a4{width:auto;height:auto;overflow:visible;border:0;padding:10mm}}</style></head><body>${clone.outerHTML}</body></html>`;
 
       const iframe = document.createElement('iframe');
       iframe.style.position = 'fixed';
@@ -415,56 +367,7 @@
           else { img.onload = img.onerror = () => { if (--pending === 0) done(); }; }
         });
       };
-      // Usa srcdoc para evitar políticas de pop-up
       iframe.srcdoc = html;
-    }
-  </script>
-
-  <script>
-    const el = (id) => document.getElementById(id);
-    const fmt = (v) => {
-      const n = Number(v) || 0;
-      try {
-        return new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(n);
-      } catch (e) {
-        return 'R$ ' + n.toFixed(2).replace('.', ',');
-      }
-    };
-
-    // ====== Vetorial via jsPDF.html (download sem pop‑up) ======
-    async function downloadVectorFrom(node, filename) {
-      await ensureJsPDF();
-      await ensureHtml2Canvas();
-      const { jsPDF } = window.jspdf;
-      const clone = node.cloneNode(true);
-      clone.style.height = 'auto';
-      clone.style.overflow = 'visible';
-      const wrap = document.createElement('div');
-      wrap.style.width = '794px';
-      wrap.appendChild(clone);
-      await waitForImages(wrap);
-      const margin = 28.35; // 10mm
-      const pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
-      await pdf.html(wrap, {
-        x: margin,
-        y: margin,
-        width: 595.28 - margin * 2,
-        windowWidth: 794,
-        autoPaging: 'text',
-        html2canvas: { scale: 1.25, useCORS: true, letterRendering: true },
-        callback: (doc) => doc.save(filename)
-      });
-    }
-
-    // ====== Compatibilidade (imagem) ======
-    async function downloadImageBasedFrom(node, filename) {
-      await ensureHtml2pdf();
-      await waitForImages(node);
-      const opt = { margin:[10,10,10,10], filename, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true,scrollY:0,letterRendering:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
-      const prevH = node.style.height, prevO = node.style.overflow, prevST = node.scrollTop;
-      node.style.height = 'auto'; node.style.overflow = 'visible'; node.scrollTop = 0;
-      await window.html2pdf().set(opt).from(node).save();
-      node.style.height = prevH; node.style.overflow = prevO; node.scrollTop = prevST;
     }
   </script>
 
@@ -562,17 +465,12 @@
       }
     });
 
-    // ===== Exportações =====
-    async function genPDFAll_image() {
+    // ÚNICO botão para PDF (Pacotes)
+    el('btnPrintAll').addEventListener('click', () => {
       const node = document.getElementById('a4-principal');
       headerInfoToPreview();
-      await downloadImageBasedFrom(node, `Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`);
-    }
-    async function genPDFAll_vector() {
-      const node = document.getElementById('a4-principal');
-      headerInfoToPreview();
-      await downloadVectorFrom(node, `Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`);
-    }
+      printAsVectorIframe(node, `Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}`);
+    });
 
     // ===================== SERVIÇOS (7) =====================
     const SERVICOS = {
@@ -613,6 +511,17 @@
       return any;
     }
 
+    // ÚNICO botão para PDF (Serviços)
+    document.getElementById('btnPrint7').addEventListener('click', () => {
+      if (!renderServicos()) { alert('Selecione ao menos um serviço.'); return; }
+      const node = document.getElementById('a4-servicos');
+      printAsVectorIframe(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}`);
+    });
+
+    // Atualizar prévia
+    document.getElementById('btnAtualizar7').addEventListener('click', renderServicos);
+    document.getElementById('selTodos7').addEventListener('change', (e) => { const on = e.target.checked; document.querySelectorAll('.svcChk7').forEach(cb => cb.checked = on); renderServicos(); });
+
     // ===================== Logos =====================
     function applyLogos() {
       const data = el('logoBase64').value.trim();
@@ -630,9 +539,9 @@
       reader.readAsDataURL(f);
     });
 
-    // ===================== Pager (ajustado) =====================
+    // ===================== Pager (prévia) =====================
     function pageMetrics(box) {
-      const step = Math.round(box.clientHeight) || 1123; // altura visível da A4
+      const step = Math.round(box.clientHeight) || 1123;
       const total = Math.max(1, Math.ceil(box.scrollHeight / step));
       return { step, total };
     }
@@ -670,35 +579,10 @@
       new ResizeObserver(() => updatePager(which)).observe(box);
     }
 
-    // ===================== Eventos =====================
+    // Eventos gerais
     el('pacote').addEventListener('change', buildSuboptions);
     el('btnAddItem').addEventListener('click', addItem);
     el('btnClearItems').addEventListener('click', () => { el('items').innerHTML=''; itemCount=0; updatePager('principal'); });
-
-    // Download/Impressão: três modos
-    el('btnPrintAll').addEventListener('click', () => { const node = document.getElementById('a4-principal'); headerInfoToPreview(); printAsVectorIframe(node, `Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}`); });
-    el('btnVectorAll').addEventListener('click', () => genPDFAll_vector());
-    el('btnPDFall').addEventListener('click', () => genPDFAll_image());
-
-    document.getElementById('selTodos7').addEventListener('change', (e) => { const on = e.target.checked; document.querySelectorAll('.svcChk7').forEach(cb => cb.checked = on); renderServicos(); });
-    document.getElementById('btnAtualizar7').addEventListener('click', renderServicos);
-
-    // Serviços: três modos
-    document.getElementById('btnPrint7').addEventListener('click', () => {
-      if (!renderServicos()) { alert('Selecione ao menos um serviço.'); return; }
-      const node = document.getElementById('a4-servicos');
-      printAsVectorIframe(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}`);
-    });
-    document.getElementById('btnVector7').addEventListener('click', async () => {
-      if (!renderServicos()) { alert('Selecione ao menos um serviço.'); return; }
-      const node = document.getElementById('a4-servicos');
-      await downloadVectorFrom(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`);
-    });
-    document.getElementById('btnPDF7').addEventListener('click', async () => {
-      const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; }
-      const node = document.getElementById('a4-servicos');
-      await downloadImageBasedFrom(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`);
-    });
 
     el('prev-principal').addEventListener('click', () => goToPage('principal', -1));
     el('next-principal').addEventListener('click', () => goToPage('principal', 1));
