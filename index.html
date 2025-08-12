@@ -7,250 +7,272 @@
   <style>
     :root { --accent:#111; --muted:#666; --line:#ddd; }
     * { box-sizing: border-box; }
+    html, body { height:100%; }
     body { font-family: Arial, Helvetica, sans-serif; margin: 0; background: #f6f6f6; color:#111; }
-    header { background:#fff; border-bottom:1px solid var(--line); padding: 16px 20px; display:flex; gap:16px; align-items:center; position:sticky; top:0; z-index:1; }
+
+    header { background:#fff; border-bottom:1px solid var(--line); padding: 12px 16px; display:flex; gap:16px; align-items:center; position:sticky; top:0; z-index:1; }
     .logos { display:flex; gap:10px; align-items:center; }
-    .logos img { width: 90px; height: 90px; object-fit: contain; border:1px solid #eee; background:#fafafa; }
+    .logos img { width: 80px; height: 80px; object-fit: contain; border:1px solid #eee; background:#fafafa; }
     .header-text { display:flex; flex-direction:column; gap:2px; }
     .header-text h1 { margin:0; font-size: 18px; letter-spacing: .3px; }
     .header-text .sub { color:var(--muted); font-size: 12px; }
 
-    main { max-width: 1080px; margin: 0 auto; padding: 20px; display:flex; flex-direction:column; gap: 18px; }
-    section { background:#fff; border:1px solid var(--line); padding:16px; }
-    section h2 { margin:0 0 10px; font-size: 14px; letter-spacing:.3px; color:#333; }
+    main { max-width: 1300px; margin: 0 auto; padding: 16px; display:flex; flex-direction:column; gap: 16px; }
+    section { background:#fff; border:1px solid var(--line); }
+    section h2 { margin:0; padding:12px 12px 0; font-size: 14px; letter-spacing:.3px; color:#333; }
+    .pane { display:grid; grid-template-columns: minmax(360px, 1fr) 820px; gap: 12px; align-items:start; padding: 12px; }
+
+    /* ===== Form ===== */
     label { display:block; font-size:12px; color:#333; margin:8px 0 4px; }
     input[type="text"], input[type="number"], select, textarea { width:100%; padding:8px; border:1px solid var(--line); font-size: 13px; background:#fff; }
     textarea { min-height: 84px; resize: vertical; }
     .row { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .btns { display:flex; gap:10px; flex-wrap:wrap; }
+    .btns { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
     button { background:#111; color:#fff; border:0; padding:10px 14px; font-size:13px; cursor:pointer; }
     button.secondary { background:#555; }
     button.soft { background:#888; }
-    button.link { background:transparent; color:#111; border:1px solid var(--line); }
 
-    /* Quadros exportáveis (PDF) */
-    .export-box { background:#fff; border:1px solid var(--line); padding:20px; }
-    .orc-doc-header { display:flex; align-items:center; gap:16px; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:12px; }
-    .orc-doc-header .htxt h3 { margin:0; font-size:18px; }
-    .orc-doc-header .htxt p { margin:2px 0; color:var(--muted); font-size:12px; }
+    /* ===== A4 PREVIEW (fixo) ===== */
+    .a4-wrap { display:flex; justify-content:center; }
+    .a4 { width:794px; min-height:1123px; background:#fff; border:1px solid var(--line); padding:18px; }
 
-    .kv { display:grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-bottom: 12px; }
+    .doc-header { display:flex; align-items:center; gap:16px; border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:10px; }
+    .doc-header .logos img { width:70px; height:70px; }
+    .doc-header .htxt h3 { margin:0; font-size:18px; }
+    .doc-header .htxt p { margin:2px 0; color:var(--muted); font-size:12px; }
+
+    .kv { display:grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-bottom: 10px; }
     .kv div { font-size:12px; }
     .kv strong { display:block; color:#333; }
 
     table { width:100%; border-collapse: collapse; margin-top: 8px; }
     th, td { border:1px solid var(--line); padding:8px; font-size:12px; vertical-align: top; }
-    th { background:#fafafa; text-align:left; }
+    thead { background:#fafafa; }
     tfoot td { font-weight:bold; }
     .muted { color:var(--muted); font-size:11px; }
 
-    .orc-item { border:1px solid var(--line); padding:12px; margin: 14px 0; background:#fff; position:relative; }
+    .orc-item { border:1px solid var(--line); padding:10px; margin: 10px 0; background:#fff; position:relative; page-break-inside: avoid; break-inside: avoid; }
     .orc-item h4 { margin:0 0 6px 0; font-size:13px; }
-    .obs-box { border:1px solid #bbb; min-height:60px; padding:8px; white-space: pre-wrap; }
     .rm { position:absolute; top:8px; right:8px; font-size:12px; padding:4px 8px; border:1px solid #ccc; background:#fff; cursor:pointer; }
 
-    /* Evitar quebras no meio dos blocos no PDF */
-    .orc-item, .orc-item table, .orc-item h4, .obs-box { page-break-inside: avoid; break-inside: avoid; }
+    .doc-obs { border:1px solid #bbb; min-height:80px; padding:10px; white-space: pre-wrap; margin-top:10px; }
 
+    /* ===== PDF multipágina estável ===== */
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    table, tr, td, th, .doc-header, .kv { page-break-inside: avoid; break-inside: avoid; }
+
+    @page { size: A4; margin: 10mm; }
     @media print { header, .controls { display:none !important; } body { background:#fff; } }
   </style>
 </head>
 <body>
-  <header class="controls">
+  <header>
     <div class="logos">
       <img id="pdfLogo1" alt="Logo base64" />
       <img id="pdfLogo2" alt="Logo adicional" />
     </div>
     <div class="header-text">
       <h1>Calculadora de Orçamento – Multi‑pacotes</h1>
-      <div class="sub">Pacotes 1–6 empilhados em um único PDF + Serviços (Pacote 7) separado. Logo 1 (BASE64 fixa) + Logo 2 (upload).</div>
+      <div class="sub">Pré‑visualização fixa em A4 à direita. Pacotes 1–6 empilhados + Serviços (7) separado. Logo 1 (BASE64) + Logo 2 (upload).</div>
     </div>
   </header>
 
   <main>
-    <!-- ===================== CALCULADORA PRINCIPAL (1–6) ===================== -->
-    <section class="controls" id="ctrl-main">
-      <h2>Configurações – Pacotes 1–6</h2>
-
-      <label for="logoBase64">Logo 1 (BASE64 Data URL)</label>
-      <textarea id="logoBase64" placeholder="Cole aqui sua logo como Data URL base64 (ex.: data:image/png;base64,...)" style="font-family: monospace; min-height:70px"></textarea>
-      <div class="row">
-        <div>
-          <label for="logo2Input">Logo 2 (PNG/JPG)</label>
-          <input id="logo2Input" type="file" accept="image/*" />
-        </div>
-        <div>
-          <label for="empresa">Empresa/Produtor</label>
-          <input id="empresa" type="text" placeholder="Ex.: Estúdio KCM / Seu nome" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label for="cnpj">CNPJ/CPF (opcional)</label>
-          <input id="cnpj" type="text" placeholder="Ex.: 00.000.000/0001-00" />
-        </div>
-        <div>
-          <label for="cliente">Cliente</label>
-          <input id="cliente" type="text" placeholder="Nome do cliente" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label for="validade">Validade do orçamento (dias)</label>
-          <input id="validade" type="number" value="30" />
-        </div>
-        <div>
-          <label for="dataDoc">Data do documento</label>
-          <input id="dataDoc" type="text" placeholder="auto" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label for="titulo">Título do livro</label>
-          <input id="titulo" type="text" value="História do PSF em Campina Grande" />
-        </div>
-        <div>
-          <label for="autor">Autor(a)</label>
-          <input id="autor" type="text" value="Erinaldo Guimarães" />
-        </div>
-      </div>
-
-      <label for="pacote">Pacote a adicionar</label>
-      <select id="pacote">
-        <option value="1">1) Ebook (PDF) + Distribuição Digital — R$ 1.200,00</option>
-        <option value="2">2) Ebook (PDF + EPUB/MOBI) + Distribuição Digital — R$ 1.500,00</option>
-        <option value="3">3) Ebook (PDF + Audiobook) + Distribuição Digital — R$ 2.200,00</option>
-        <option value="4">4) Livro Impresso (serviços completos) — Escolher abaixo</option>
-        <option value="5">5) Impresso + Ebook (PDF/EPUB/MOBI) — Escolher abaixo</option>
-        <option value="6">6) Impresso + Ebook + Audiobook — Escolher abaixo</option>
-      </select>
-
-      <div id="suboptions"></div>
-
-      <label for="obsAtual">Observações deste pacote (retângulo)</label>
-      <textarea id="obsAtual" placeholder="Observações, descrições, condições específicas deste pacote."></textarea>
-
-      <div class="btns">
-        <button id="btnAddItem">Adicionar pacote</button>
-        <button id="btnClearItems" class="soft">Limpar lista</button>
-        <button id="btnPDFall" class="secondary">Gerar PDF (todos os pacotes)</button>
-      </div>
-    </section>
-
+    <!-- ===================== BLOCO 1: PACOTES 1–6 ===================== -->
     <section>
-      <h2>Pré‑visualização – Pacotes 1–6 (empilhados)</h2>
-      <div id="orcamentoStack" class="export-box">
-        <div class="orc-doc-header">
-          <div class="logos">
-            <img id="pdfLogo1_top" alt="Logo base64" />
-            <img id="pdfLogo2_top" alt="Logo adicional" />
+      <h2>Pacotes 1–6</h2>
+      <div class="pane">
+        <!-- CONTROLES ESQUERDA -->
+        <div class="controls">
+          <label for="logoBase64">Logo 1 (BASE64 Data URL)</label>
+          <textarea id="logoBase64" placeholder="Cole sua logo como Data URL base64 (ex.: data:image/png;base64,...)" style="font-family: monospace; min-height:70px"></textarea>
+
+          <div class="row">
+            <div>
+              <label for="logo2Input">Logo 2 (PNG/JPG)</label>
+              <input id="logo2Input" type="file" accept="image/*" />
+            </div>
+            <div>
+              <label for="empresa">Empresa/Produtor</label>
+              <input id="empresa" type="text" placeholder="Ex.: Estúdio KCM / Seu nome" />
+            </div>
           </div>
-          <div class="htxt">
-            <h3>ORÇAMENTOS DE PRODUÇÃO DE LIVRO (Pacotes 1–6)</h3>
-            <p id="empresaLinha">—</p>
-            <p id="validadeLinha" class="muted">Validade: —</p>
+
+          <div class="row">
+            <div>
+              <label for="cnpj">CNPJ/CPF (opcional)</label>
+              <input id="cnpj" type="text" placeholder="Ex.: 00.000.000/0001-00" />
+            </div>
+            <div>
+              <label for="cliente">Cliente</label>
+              <input id="cliente" type="text" placeholder="Nome do cliente" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="validade">Validade (dias)</label>
+              <input id="validade" type="number" value="30" />
+            </div>
+            <div>
+              <label for="dataDoc">Data do documento</label>
+              <input id="dataDoc" type="text" placeholder="auto" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="titulo">Título do livro</label>
+              <input id="titulo" type="text" value="História do PSF em Campina Grande" />
+            </div>
+            <div>
+              <label for="autor">Autor(a)</label>
+              <input id="autor" type="text" value="Erinaldo Guimarães" />
+            </div>
+          </div>
+
+          <label for="pacote">Pacote a adicionar</label>
+          <select id="pacote">
+            <option value="1">1) Ebook (PDF) + Distribuição Digital — R$ 1.200,00</option>
+            <option value="2">2) Ebook (PDF + EPUB/MOBI) + Distribuição Digital — R$ 1.500,00</option>
+            <option value="3">3) Ebook (PDF + Audiobook) + Distribuição Digital — R$ 2.200,00</option>
+            <option value="4">4) Livro Impresso (serviços completos) — Escolher abaixo</option>
+            <option value="5">5) Impresso + Ebook (PDF/EPUB/MOBI) — Escolher abaixo</option>
+            <option value="6">6) Impresso + Ebook + Audiobook — Escolher abaixo</option>
+          </select>
+          <div id="suboptions"></div>
+
+          <label for="obsDoc">Descrição / Observações gerais (para TODO o arquivo)</label>
+          <textarea id="obsDoc" placeholder="Texto único usado no final do PDF, independentemente da quantidade de pacotes adicionados."></textarea>
+
+          <div class="btns">
+            <button id="btnAddItem">Adicionar pacote</button>
+            <button id="btnClearItems" class="soft">Limpar lista</button>
+            <button id="btnPDFall" class="secondary">Gerar PDF (todos os pacotes)</button>
           </div>
         </div>
-        <div class="kv">
-          <div><strong>Cliente:</strong><span id="kvCliente">—</span></div>
-          <div><strong>Data:</strong><span id="kvData">—</span></div>
-          <div><strong>Título:</strong><span id="kvTitulo">—</span></div>
-          <div><strong>Autor(a):</strong><span id="kvAutor">—</span></div>
+
+        <!-- PRÉVIA A4 DIREITA -->
+        <div class="a4-wrap">
+          <div id="a4-principal" class="a4">
+            <div class="doc-header">
+              <div class="logos">
+                <img id="pdfLogo1_top" alt="Logo base64" />
+                <img id="pdfLogo2_top" alt="Logo adicional" />
+              </div>
+              <div class="htxt">
+                <h3>ORÇAMENTOS DE PRODUÇÃO DE LIVRO (Pacotes 1–6)</h3>
+                <p id="empresaLinha">—</p>
+                <p id="validadeLinha" class="muted">Validade: —</p>
+              </div>
+            </div>
+            <div class="kv">
+              <div><strong>Cliente:</strong><span id="kvCliente">—</span></div>
+              <div><strong>Data:</strong><span id="kvData">—</span></div>
+              <div><strong>Título:</strong><span id="kvTitulo">—</span></div>
+              <div><strong>Autor(a):</strong><span id="kvAutor">—</span></div>
+            </div>
+            <div id="items"></div>
+            <div style="margin-top:8px"><strong>Descrição / Observações gerais:</strong></div>
+            <div id="obsDocPreview" class="doc-obs"></div>
+          </div>
         </div>
-        <div id="items"></div>
       </div>
     </section>
 
-    <!-- ===================== CALCULADORA DE SERVIÇOS (PACOTE 7) ===================== -->
-    <section class="controls" id="ctrl-serv">
-      <h2>Serviços Específicos – Pacote 7 (avulso ou pacote)</h2>
-      <div class="row">
-        <div>
-          <label for="cliente7">Cliente</label>
-          <input id="cliente7" type="text" placeholder="Nome do cliente" />
-        </div>
-        <div>
-          <label for="validade7">Validade do orçamento (dias)</label>
-          <input id="validade7" type="number" value="30" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label for="titulo7">Título do livro (opcional)</label>
-          <input id="titulo7" type="text" />
-        </div>
-        <div>
-          <label for="autor7">Autor(a) (opcional)</label>
-          <input id="autor7" type="text" />
-        </div>
-      </div>
-
-      <div style="border:1px solid var(--line); padding:10px; background:#fcfcfc;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <strong>Selecione os serviços</strong>
-          <label style="display:flex; gap:6px; align-items:center; font-size:12px;"><input type="checkbox" id="selTodos7"/> Selecionar todos (pacote completo – R$ 2.130,00)</label>
-        </div>
-        <div class="svc"><input type="checkbox" class="svcChk7" data-key="copidesque"> Copidesque / Adaptação editorial – <span class="muted">R$ 500,00</span></div>
-        <div class="svc"><input type="checkbox" class="svcChk7" data-key="revisao"> Revisão ortográfica e gramatical – <span class="muted">R$ 400,00</span></div>
-        <div class="svc"><input type="checkbox" class="svcChk7" data-key="preparacao"> Preparação textual – <span class="muted">R$ 250,00</span></div>
-        <div class="svc"><input type="checkbox" class="svcChk7" data-key="diagramacao"> Diagramação – <span class="muted">R$ 400,00</span></div>
-        <div class="svc"><input type="checkbox" class="svcChk7" data-key="capa"> Criação de capa e contracapa – <span class="muted">R$ 250,00</span></div>
-        <div class="svc"><input type="checkbox" class="svcChk7" data-key="epub"> Conversão para EPUB/MOBI – <span class="muted">R$ 150,00</span></div>
-        <div class="svc"><input type="checkbox" class="svcChk7" data-key="ficha"> Ficha catalográfica e ISBN – <span class="muted">R$ 150,00</span></div>
-        <div class="svc"><input type="checkbox" class="svcChk7" data-key="registro"> Registro de direitos autorais – <span class="muted">R$ 30,00</span></div>
-      </div>
-
-      <label for="obs7">Observações (aparecem no PDF)</label>
-      <textarea id="obs7" placeholder="Prazos, condições, escopo adicional, etc."></textarea>
-
-      <div class="btns">
-        <button id="btnAtualizar7">Calcular/Atualizar</button>
-        <button id="btnPDF7" class="secondary">Gerar PDF (Serviços)</button>
-      </div>
-    </section>
-
+    <!-- ===================== BLOCO 2: SERVIÇOS 7 ===================== -->
     <section>
-      <h2>Pré‑visualização – Serviços (Pacote 7)</h2>
-      <div id="orc-servicos" class="export-box">
-        <div class="orc-doc-header">
-          <div class="logos">
-            <img id="pdfLogo1_serv" alt="Logo base64" />
-            <img id="pdfLogo2_serv" alt="Logo adicional" />
+      <h2>Serviços (Pacote 7)</h2>
+      <div class="pane">
+        <!-- CONTROLES ESQUERDA -->
+        <div class="controls">
+          <div class="row">
+            <div>
+              <label for="cliente7">Cliente</label>
+              <input id="cliente7" type="text" placeholder="Nome do cliente" />
+            </div>
+            <div>
+              <label for="validade7">Validade (dias)</label>
+              <input id="validade7" type="number" value="30" />
+            </div>
           </div>
-          <div class="htxt">
-            <h3>ORÇAMENTO DE SERVIÇOS EDITORIAIS (Pacote 7)</h3>
-            <p id="empresaLinha7">—</p>
-            <p id="validadeLinha7" class="muted">Validade: —</p>
+
+          <div class="row">
+            <div>
+              <label for="titulo7">Título (opcional)</label>
+              <input id="titulo7" type="text" />
+            </div>
+            <div>
+              <label for="autor7">Autor(a) (opcional)</label>
+              <input id="autor7" type="text" />
+            </div>
+          </div>
+
+          <div style="border:1px solid var(--line); padding:10px; background:#fcfcfc;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <strong>Selecione os serviços</strong>
+              <label style="display:flex; gap:6px; align-items:center; font-size:12px;"><input type="checkbox" id="selTodos7"/> Selecionar todos (R$ 2.130,00)</label>
+            </div>
+            <div class="svc"><input type="checkbox" class="svcChk7" data-key="copidesque"> Copidesque / Adaptação editorial – <span class="muted">R$ 500,00</span></div>
+            <div class="svc"><input type="checkbox" class="svcChk7" data-key="revisao"> Revisão ortográfica e gramatical – <span class="muted">R$ 400,00</span></div>
+            <div class="svc"><input type="checkbox" class="svcChk7" data-key="preparacao"> Preparação textual – <span class="muted">R$ 250,00</span></div>
+            <div class="svc"><input type="checkbox" class="svcChk7" data-key="diagramacao"> Diagramação – <span class="muted">R$ 400,00</span></div>
+            <div class="svc"><input type="checkbox" class="svcChk7" data-key="capa"> Criação de capa e contracapa – <span class="muted">R$ 250,00</span></div>
+            <div class="svc"><input type="checkbox" class="svcChk7" data-key="epub"> Conversão para EPUB/MOBI – <span class="muted">R$ 150,00</span></div>
+            <div class="svc"><input type="checkbox" class="svcChk7" data-key="ficha"> Ficha catalográfica e ISBN – <span class="muted">R$ 150,00</span></div>
+            <div class="svc"><input type="checkbox" class="svcChk7" data-key="registro"> Registro de direitos autorais – <span class="muted">R$ 30,00</span></div>
+          </div>
+
+          <label for="obs7">Observações (PDF Serviços)</label>
+          <textarea id="obs7" placeholder="Prazos, condições, escopo adicional, etc."></textarea>
+
+          <div class="btns">
+            <button id="btnAtualizar7">Atualizar</button>
+            <button id="btnPDF7" class="secondary">Gerar PDF (Serviços)</button>
           </div>
         </div>
-        <div class="kv">
-          <div><strong>Cliente:</strong><span id="kvCliente7">—</span></div>
-          <div><strong>Data:</strong><span id="kvData7">—</span></div>
-          <div><strong>Título (opcional):</strong><span id="kvTitulo7">—</span></div>
-          <div><strong>Autor(a) (opcional):</strong><span id="kvAutor7">—</span></div>
+
+        <!-- PRÉVIA A4 DIREITA -->
+        <div class="a4-wrap">
+          <div id="a4-servicos" class="a4">
+            <div class="doc-header">
+              <div class="logos">
+                <img id="pdfLogo1_serv" alt="Logo base64" />
+                <img id="pdfLogo2_serv" alt="Logo adicional" />
+              </div>
+              <div class="htxt">
+                <h3>ORÇAMENTO DE SERVIÇOS EDITORIAIS (Pacote 7)</h3>
+                <p id="empresaLinha7">—</p>
+                <p id="validadeLinha7" class="muted">Validade: —</p>
+              </div>
+            </div>
+            <div class="kv">
+              <div><strong>Cliente:</strong><span id="kvCliente7">—</span></div>
+              <div><strong>Data:</strong><span id="kvData7">—</span></div>
+              <div><strong>Título (opcional):</strong><span id="kvTitulo7">—</span></div>
+              <div><strong>Autor(a) (opcional):</strong><span id="kvAutor7">—</span></div>
+            </div>
+            <table>
+              <thead>
+                <tr><th style="width:45%">Serviço</th><th style="width:35%">Descrição</th><th style="width:20%">Valor (R$)</th></tr>
+              </thead>
+              <tbody id="tbody7"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2" style="text-align:right">TOTAL</td>
+                  <td id="tdTotal7">R$ 0,00</td>
+                </tr>
+              </tfoot>
+            </table>
+            <p class="muted" id="obsLinha7" style="margin-top:10px"></p>
+          </div>
         </div>
-        <table>
-          <thead>
-            <tr><th style="width:45%">Serviço</th><th style="width:35%">Descrição</th><th style="width:20%">Valor (R$)</th></tr>
-          </thead>
-          <tbody id="tbody7"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2" style="text-align:right">TOTAL</td>
-              <td id="tdTotal7">R$ 0,00</td>
-            </tr>
-          </tfoot>
-        </table>
-        <p class="muted" id="obsLinha7" style="margin-top:10px"></p>
       </div>
     </section>
   </main>
 
-  <!-- libs: html2pdf com fallback -->
+  <!-- libs: html2pdf com fallback + espera imagens -->
   <script>
     function ensureHtml2pdf() {
       return new Promise((resolve) => {
@@ -267,6 +289,11 @@
         };
         document.body.appendChild(s);
       });
+    }
+    function waitForImages(root) {
+      const imgs = Array.from(root.querySelectorAll('img'));
+      if (imgs.length === 0) return Promise.resolve();
+      return Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = res; })));
     }
   </script>
 
@@ -309,7 +336,6 @@
       }
     }
 
-    // Cabeçalho comum
     function headerInfoToPreview() {
       const empresa = el('empresa').value.trim() || '—';
       const cnpj = el('cnpj').value.trim(); // opcional
@@ -320,7 +346,8 @@
       el('kvCliente').textContent = el('cliente').value.trim() || '—';
       const dataVal = el('dataDoc').value.trim() || new Date().toLocaleDateString('pt-BR');
       el('kvData').textContent = dataVal;
-      // logos no topo
+      el('obsDocPreview').textContent = el('obsDoc').value.trim();
+      // logos topo
       el('pdfLogo1_top').src = el('pdfLogo1').src;
       el('pdfLogo2_top').src = el('pdfLogo2').src;
     }
@@ -330,7 +357,6 @@
       headerInfoToPreview();
       const p = parseInt(el('pacote').value, 10);
       const combo = el('combo') ? el('combo').value : null;
-      const obsTxt = el('obsAtual').value.trim();
 
       let tituloPacote = PRICING[p].label;
       let detalhes = '', total = 0;
@@ -352,27 +378,27 @@
           <tbody><tr><td>${tituloPacote}</td><td>${detalhes}</td><td>${fmt(total)}</td></tr></tbody>
           <tfoot><tr><td colspan="2" style="text-align:right">TOTAL</td><td>${fmt(total)}</td></tr></tfoot>
         </table>
-        <div style="margin-top:8px"><strong>Observações:</strong></div>
-        <div class="obs-box">${obsTxt ? obsTxt.replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''}</div>
       `;
       el('items').appendChild(item);
     }
 
-    async function genPDFAll() {
-      headerInfoToPreview();
-      await ensureHtml2pdf();
-      const opt = { margin:[10,10,10,10], filename:`Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
-      window.html2pdf().set(opt).from(document.getElementById('orcamentoStack')).save();
-    }
-
     // Remoção via delegação
-    document.getElementById('items').addEventListener('click', (e) => {
+    document.addEventListener('click', (e) => {
       if (e.target.classList.contains('rm')) {
         const id = e.target.getAttribute('data-id');
         const node = document.getElementById(id);
         if (node) node.remove();
       }
     });
+
+    async function genPDFAll() {
+      headerInfoToPreview();
+      await ensureHtml2pdf();
+      const node = document.getElementById('a4-principal');
+      await waitForImages(node);
+      const opt = { margin:[10,10,10,10], filename:`Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true,scrollY:0}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
+      window.html2pdf().set(opt).from(node).save();
+    }
 
     // ===================== SERVIÇOS (7) =====================
     const SERVICOS = {
@@ -395,8 +421,6 @@
       el('kvTitulo7').textContent = el('titulo7').value.trim() || '—';
       el('kvAutor7').textContent = el('autor7').value.trim() || '—';
       el('kvData7').textContent = new Date().toLocaleDateString('pt-BR');
-
-      // sincronizar logos
       el('pdfLogo1_serv').src = el('pdfLogo1').src;
       el('pdfLogo2_serv').src = el('pdfLogo2').src;
 
@@ -416,14 +440,11 @@
 
     // ===================== Logos =====================
     function applyLogos() {
-      // Base64 principal
       const data = el('logoBase64').value.trim();
       if (data && data.startsWith('data:image')) {
         el('pdfLogo1').src = data; el('pdfLogo1_top').src = data; el('pdfLogo1_serv').src = data;
       }
     }
-
-    // Logo 2 (upload)
     document.getElementById('logo2Input').addEventListener('change', (ev) => {
       const f = ev.target.files?.[0]; if (!f) return;
       const reader = new FileReader();
@@ -433,28 +454,23 @@
       reader.readAsDataURL(f);
     });
 
-    // ===================== Eventos globais =====================
-    // Subopções do pacote
+    // ===================== Eventos =====================
     el('pacote').addEventListener('change', buildSuboptions);
-
-    // Botões principal
     el('btnAddItem').addEventListener('click', addItem);
     el('btnClearItems').addEventListener('click', () => { el('items').innerHTML=''; itemCount=0; });
-    el('btnPDFall').addEventListener('click', async () => { headerInfoToPreview(); await ensureHtml2pdf(); const opt = { margin:[10,10,10,10], filename:`Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} }; window.html2pdf().set(opt).from(document.getElementById('orcamentoStack')).save(); });
+    el('btnPDFall').addEventListener('click', genPDFAll);
 
-    // Serviços
     document.getElementById('selTodos7').addEventListener('change', (e) => { const on = e.target.checked; document.querySelectorAll('.svcChk7').forEach(cb => cb.checked = on); renderServicos(); });
     document.getElementById('btnAtualizar7').addEventListener('click', renderServicos);
-    document.getElementById('btnPDF7').addEventListener('click', async () => { const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; } await ensureHtml2pdf(); const opt = { margin:[10,10,10,10], filename:`Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} }; window.html2pdf().set(opt).from(document.getElementById('orc-servicos')).save(); });
+    document.getElementById('btnPDF7').addEventListener('click', async () => { const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; } await ensureHtml2pdf(); const node = document.getElementById('a4-servicos'); await waitForImages(node); const opt = { margin:[10,10,10,10], filename:`Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true,scrollY:0}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} }; window.html2pdf().set(opt).from(node).save(); });
 
-    // Atualizações de cabeçalho/kv
     document.addEventListener('input', (e) => {
-      if (['empresa','cnpj','cliente','validade','titulo','autor','dataDoc'].includes(e.target.id)) headerInfoToPreview();
+      if (['empresa','cnpj','cliente','validade','titulo','autor','dataDoc','obsDoc'].includes(e.target.id)) headerInfoToPreview();
+      if (['cliente7','validade7','titulo7','autor7','obs7'].includes(e.target.id) || e.target.classList.contains('svcChk7')) renderServicos();
       if (e.target.id === 'logoBase64') applyLogos();
     });
 
     // Inicialização
-    // Base64 padrão: pixel transparente (pode trocar pela sua logo base64)
     const defaultPixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO1l2bQAAAAASUVORK5CYII=';
     el('logoBase64').value = defaultPixel;
     applyLogos();
