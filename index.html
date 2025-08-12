@@ -56,6 +56,8 @@
     th, td { border:1px solid var(--line); padding:8px; font-size:12px; vertical-align: top; line-height:1.35; }
     thead { background:var(--head); }
     tbody tr:nth-child(odd) { background: var(--zebra); }
+    .money { text-align:right; white-space:nowrap; }
+    .nowrap { white-space:nowrap; }
     tfoot td { font-weight:bold; background:#fafafa; }
     .muted { color:var(--muted); font-size:11px; }
 
@@ -332,9 +334,36 @@
         s.onload = () => resolve();
         s.onerror = () => {
           const s2 = document.createElement('script');
-          s2.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
+          s2.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
           s2.onload = () => resolve();
           s2.onerror = () => { alert('Não foi possível carregar a biblioteca de PDF (vetorial).'); };
+          document.body.appendChild(s2);
+        };
+        document.body.appendChild(s);
+      });
+    }
+    function ensureHtml2Canvas() {
+      return new Promise((resolve) => {
+        if (window.html2canvas) return resolve();
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        s.onload = () => resolve();
+        s.onerror = () => {
+          const s2 = document.createElement('script');
+          s2.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+          s2.onload = () => resolve();
+          s2.onerror = () => {
+            const s3 = document.createElement('script');
+            s3.src = 'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js';
+            s3.onload = () => resolve();
+            s3.onerror = () => { alert('Não foi possível carregar o html2canvas (necessário para o PDF vetorial).'); };
+            document.body.appendChild(s3);
+          };
+          document.body.appendChild(s2);
+        };
+        document.body.appendChild(s);
+      });
+    };
           document.body.appendChild(s2);
         };
         document.body.appendChild(s);
@@ -354,7 +383,27 @@
     // ====== Vetorial via jsPDF.html (download sem pop‑up) ======
     async function downloadVectorFrom(node, filename) {
       await ensureJsPDF();
+      await ensureHtml2Canvas();
       const { jsPDF } = window.jspdf;
+      const clone = node.cloneNode(true);
+      clone.style.height = 'auto';
+      clone.style.overflow = 'visible';
+      const wrap = document.createElement('div');
+      wrap.style.width = '794px';
+      wrap.appendChild(clone);
+      await waitForImages(wrap);
+      const margin = 28.35; // 10mm
+      const pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
+      await pdf.html(wrap, {
+        x: margin,
+        y: margin,
+        width: 595.28 - margin * 2,
+        windowWidth: 794,
+        autoPaging: 'text',
+        html2canvas: { scale: 1.25, useCORS: true, letterRendering: true },
+        callback: (doc) => doc.save(filename)
+      });
+    } = window.jspdf;
       // Clona o nó e remove o overflow fixo para caber inteiro
       const clone = node.cloneNode(true);
       clone.style.height = 'auto';
@@ -468,7 +517,7 @@
         <h4><strong>${itemCount}.</strong> ${tituloPacote}</h4>
         <table>
           <thead><tr><th style="width:50%">Descrição</th><th style="width:25%">Detalhes</th><th style="width:25%">Valor (R$)</th></tr></thead>
-          <tbody><tr><td>${tituloPacote}</td><td>${detalhes}</td><td>${fmt(total)}</td></tr></tbody>
+          <tbody><tr><td>${tituloPacote}</td><td>${detalhes}</td><td class="money">${fmt(total)}</td></tr></tbody>
           <tfoot><tr><td colspan="2" style="text-align:right">TOTAL</td><td>${fmt(total)}</td></tr></tfoot>
         </table>
       `;
@@ -531,7 +580,7 @@
         tr.innerHTML = `<td>${s.nome}</td><td>${s.desc}</td><td>${(s.valor).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</td>`;
         tbody.appendChild(tr); total += s.valor;
       });
-      el('tdTotal7').textContent = total.toLocaleString('pt-BR',{style:'currency','currencyDisplay':'symbol'});
+      el('tdTotal7').textContent = fmt(total);
       el('obsLinha7').textContent = el('obs7').value.trim();
       requestAnimationFrame(() => updatePager('servicos'));
       return any;
