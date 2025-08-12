@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calculadora de Orçamento – Livro (Pacotes 1–6) + Serviços (Pacote 7)</title>
+  <title>Calculadora de Orçamento – Multi‑pacotes (1–6) + Serviços (7)</title>
   <style>
     :root { --accent:#111; --muted:#666; --line:#ddd; }
     * { box-sizing: border-box; }
@@ -14,7 +14,7 @@
     .header-text h1 { margin:0; font-size: 18px; letter-spacing: .3px; }
     .header-text .sub { color:var(--muted); font-size: 12px; }
 
-    main { max-width: 1024px; margin: 0 auto; padding: 20px; display:flex; flex-direction:column; gap: 18px; }
+    main { max-width: 1080px; margin: 0 auto; padding: 20px; display:flex; flex-direction:column; gap: 18px; }
     section { background:#fff; border:1px solid var(--line); padding:16px; }
     section h2 { margin:0 0 10px; font-size: 14px; letter-spacing:.3px; color:#333; }
     label { display:block; font-size:12px; color:#333; margin:8px 0 4px; }
@@ -28,10 +28,10 @@
 
     /* Quadros exportáveis (PDF) */
     .export-box { background:#fff; border:1px solid var(--line); padding:20px; }
-    .orc-header { display:flex; align-items:center; gap:16px; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:12px; }
-    .orc-header img { width:90px; height:90px; object-fit:contain; border:1px solid #eee; background:#fafafa; }
-    .orc-header .htxt h3 { margin:0; font-size:18px; }
-    .orc-header .htxt p { margin:2px 0; color:var(--muted); font-size:12px; }
+    .orc-doc-header { display:flex; align-items:center; gap:16px; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:12px; }
+    .orc-doc-header img { width:90px; height:90px; object-fit:contain; border:1px solid #eee; background:#fafafa; }
+    .orc-doc-header .htxt h3 { margin:0; font-size:18px; }
+    .orc-doc-header .htxt p { margin:2px 0; color:var(--muted); font-size:12px; }
 
     .kv { display:grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-bottom: 12px; }
     .kv div { font-size:12px; }
@@ -43,22 +43,19 @@
     tfoot td { font-weight:bold; }
     .muted { color:var(--muted); font-size:11px; }
 
-    /* PDF multipágina */
-    #pdfStack { display:none; }
-    .pdf-page { page-break-after: always; }
+    .orc-item { border:1px solid var(--line); padding:12px; margin: 14px 0; background:#fff; }
+    .orc-item h4 { margin:0 0 6px 0; font-size:13px; }
+    .obs-box { border:1px solid #bbb; min-height:60px; padding:8px; white-space: pre-wrap; }
 
-    @media print {
-      header, .controls { display:none !important; }
-      body { background:#fff; }
-    }
+    @media print { header, .controls { display:none !important; } body { background:#fff; } }
   </style>
 </head>
 <body>
   <header class="controls">
     <img id="logo" alt="Logo" />
     <div class="header-text">
-      <h1>Calculadora de Orçamento – Livro</h1>
-      <div class="sub">Pacotes 1–6 (principal) + Serviços (Pacote 7). Geração de PDF simples ou multipágina.</div>
+      <h1>Calculadora de Orçamento – Multi‑pacotes</h1>
+      <div class="sub">Pacotes 1–6 (principal) exibidos um abaixo do outro no PDF + Serviços (Pacote 7) separado.</div>
     </div>
   </header>
 
@@ -102,7 +99,7 @@
         </div>
       </div>
 
-      <label for="pacote">Pacote</label>
+      <label for="pacote">Pacote a adicionar</label>
       <select id="pacote">
         <option value="1">1) Ebook (PDF) + Distribuição Digital — R$ 1.200,00</option>
         <option value="2">2) Ebook (PDF + EPUB/MOBI) + Distribuição Digital — R$ 1.500,00</option>
@@ -114,63 +111,36 @@
 
       <div id="suboptions"></div>
 
-      <label for="obs">Observações (aparecem no PDF)</label>
-      <textarea id="obs" placeholder="Observações, prazos, condições de pagamento, etc."></textarea>
+      <label for="obsAtual">Observações deste pacote (irá no retângulo)</label>
+      <textarea id="obsAtual" placeholder="Observações, descrições, condições específicas deste pacote."></textarea>
 
       <div class="btns">
-        <button id="btnAtualizar">Calcular/Atualizar</button>
-        <button id="btnPDFsingle" class="secondary">Gerar PDF (esta página)</button>
-        <button id="btnAddPage" class="soft" title="Adiciona a prévia atual como mais uma página">Adicionar esta página ao PDF</button>
-        <button id="btnPDFstack" class="secondary">Gerar PDF (várias páginas)</button>
-        <button id="btnClearStack" class="soft">Limpar páginas</button>
+        <button id="btnAddItem">Adicionar pacote à pré‑visualização</button>
+        <button id="btnClearItems" class="soft">Limpar lista</button>
+        <button id="btnPDFall" class="secondary">Gerar PDF (todos os pacotes adicionados)</button>
       </div>
-      <div class="muted" id="stackInfo">Nenhuma página adicionada.</div>
     </section>
 
     <section>
-      <h2>Pré-visualização – Pacotes 1–6</h2>
-      <div id="orcamento" class="export-box">
-        <div class="orc-header">
+      <h2>Pré‑visualização – Pacotes 1–6 (empilhados)</h2>
+      <div id="orcamentoStack" class="export-box">
+        <div class="orc-doc-header">
           <img id="pdfLogo" alt="Logo" />
           <div class="htxt">
-            <h3>ORÇAMENTO DE PRODUÇÃO DE LIVRO</h3>
+            <h3>ORÇAMENTOS DE PRODUÇÃO DE LIVRO (Pacotes 1–6)</h3>
             <p id="empresaLinha">—</p>
             <p id="validadeLinha" class="muted">Validade: —</p>
           </div>
         </div>
-
         <div class="kv">
-          <div><strong>Título:</strong><span id="kvTitulo">—</span></div>
-          <div><strong>Autor(a):</strong><span id="kvAutor">—</span></div>
           <div><strong>Cliente:</strong><span id="kvCliente">—</span></div>
           <div><strong>Data:</strong><span id="kvData">—</span></div>
-          <div><strong>Pacote selecionado:</strong><span id="kvPacote">—</span></div>
-          <div><strong>Especificação de material:</strong><span id="kvMaterial">—</span></div>
+          <div><strong>Título:</strong><span id="kvTitulo">—</span></div>
+          <div><strong>Autor(a):</strong><span id="kvAutor">—</span></div>
         </div>
-
-        <table id="tbl">
-          <thead>
-            <tr>
-              <th style="width:50%">Descrição</th>
-              <th style="width:25%">Detalhes</th>
-              <th style="width:25%">Valor (R$)</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2" style="text-align:right">TOTAL</td>
-              <td id="tdTotal">R$ 0,00</td>
-            </tr>
-          </tfoot>
-        </table>
-
-        <p class="muted" id="obsLinha" style="margin-top:10px"></p>
+        <div id="items"></div>
       </div>
     </section>
-
-    <!-- pilha invisível para PDF multipágina -->
-    <div id="pdfStack"></div>
 
     <!-- ===================== CALCULADORA DE SERVIÇOS (PACOTE 7) ===================== -->
     <section class="controls" id="ctrl-serv">
@@ -222,9 +192,9 @@
     </section>
 
     <section>
-      <h2>Pré-visualização – Serviços (Pacote 7)</h2>
+      <h2>Pré‑visualização – Serviços (Pacote 7)</h2>
       <div id="orc-servicos" class="export-box">
-        <div class="orc-header">
+        <div class="orc-doc-header">
           <img id="pdfLogo7" alt="Logo" />
           <div class="htxt">
             <h3>ORÇAMENTO DE SERVIÇOS EDITORIAIS (Pacote 7)</h3>
@@ -314,63 +284,56 @@
       }
     }
 
-    function renderMain() {
+    function headerInfoToPreview() {
       const empresa = el('empresa').value.trim() || '—';
       const cnpj = el('cnpj').value.trim(); // opcional
-      const cliente = el('cliente').value.trim() || '—';
-      const validade = parseInt(el('validade').value || '30', 10);
-      const titulo = el('titulo').value.trim() || '—';
-      const autor = el('autor').value.trim() || '—';
-      const pacote = parseInt(el('pacote').value, 10);
-      const combo = el('combo') ? el('combo').value : null;
-      const obs = el('obs').value.trim();
-
-      // Cabeçalho
       el('empresaLinha').textContent = cnpj ? `${empresa} — ${cnpj}` : empresa;
-      el('validadeLinha').textContent = `Validade: ${validade} dias`;
-      el('kvTitulo').textContent = titulo;
-      el('kvAutor').textContent = autor;
-      el('kvCliente').textContent = cliente;
+      el('validadeLinha').textContent = `Validade: ${parseInt(el('validade').value || '30', 10)} dias`;
+      el('kvTitulo').textContent = el('titulo').value.trim() || '—';
+      el('kvAutor').textContent = el('autor').value.trim() || '—';
+      el('kvCliente').textContent = el('cliente').value.trim() || '—';
       el('kvData').textContent = new Date().toLocaleDateString('pt-BR');
+    }
 
-      // Tabela
-      const tbody = el('tbody'); tbody.innerHTML = '';
-      let total = 0; let materialDesc = '—'; let pacoteNome = PRICING[pacote].label;
+    function addItem() {
+      headerInfoToPreview();
+      const p = parseInt(el('pacote').value, 10);
+      const combo = el('combo') ? el('combo').value : null;
+      const obsTxt = el('obsAtual').value.trim();
 
-      if ([1,2,3].includes(pacote)) {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${PRICING[pacote].label}</td><td>${PRICING[pacote].material}</td><td>${fmt(PRICING[pacote].total)}</td>`;
-        tbody.appendChild(row);
-        total = PRICING[pacote].total; materialDesc = PRICING[pacote].material;
+      let tituloPacote = PRICING[p].label;
+      let detalhes = '', total = 0;
+      if ([1,2,3].includes(p)) {
+        detalhes = PRICING[p].material; total = PRICING[p].total;
       } else {
-        const opt = PRICING[pacote].options.find(o => o.key === combo) || PRICING[pacote].options[0];
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${PRICING[pacote].label} — ${opt.label}</td><td>${opt.material}</td><td>${fmt(opt.total)}</td>`;
-        tbody.appendChild(row);
-        total = opt.total; materialDesc = opt.material; pacoteNome = PRICING[pacote].label + ' / ' + opt.label;
+        const opt = PRICING[p].options.find(o => o.key === combo) || PRICING[p].options[0];
+        tituloPacote += ' — ' + opt.label; detalhes = opt.material; total = opt.total;
       }
 
-      el('tdTotal').textContent = fmt(total);
-      el('kvPacote').textContent = pacoteNome;
-      el('kvMaterial').textContent = materialDesc;
-      el('obsLinha').textContent = obs;
+      const item = document.createElement('div');
+      item.className = 'orc-item';
+      item.innerHTML = `
+        <h4>${tituloPacote}</h4>
+        <table>
+          <thead><tr><th style="width:50%">Descrição</th><th style="width:25%">Detalhes</th><th style="width:25%">Valor (R$)</th></tr></thead>
+          <tbody><tr><td>${tituloPacote}</td><td>${detalhes}</td><td>${fmt(total)}</td></tr></tbody>
+          <tfoot><tr><td colspan="2" style="text-align:right">TOTAL</td><td>${fmt(total)}</td></tr></tfoot>
+        </table>
+        <div style="margin-top:8px"><strong>Observações:</strong></div>
+        <div class="obs-box">${obsTxt ? obsTxt.replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''}</div>
+      `;
+      el('items').appendChild(item);
+
+      // limpa observação atual (opcional)
+      // el('obsAtual').value = '';
     }
 
-    // pilha multipágina
-    let stackCount = 0;
-    function addPageToStack() {
-      // clona a prévia atual e adiciona como nova página na pilha
-      const src = el('orcamento');
-      const clone = src.cloneNode(true);
-      clone.classList.add('pdf-page');
-      // garante que a logo esteja aplicada
-      const pdfLogo = el('pdfLogo');
-      if (pdfLogo && pdfLogo.src) clone.querySelector('img#pdfLogo').src = pdfLogo.src;
-      el('pdfStack').appendChild(clone);
-      stackCount++;
-      el('stackInfo').textContent = `${stackCount} página(s) adicionada(s) à pilha.`;
+    async function genPDFAll() {
+      headerInfoToPreview();
+      await ensureHtml2pdf();
+      const opt = { margin:[10,10,10,10], filename:`Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
+      window.html2pdf().set(opt).from(document.getElementById('orcamentoStack')).save();
     }
-    function clearStack(){ el('pdfStack').innerHTML=''; stackCount=0; el('stackInfo').textContent='Nenhuma página adicionada.'; }
 
     // ===================== SERVIÇOS (7) =====================
     const SERVICOS = {
@@ -378,7 +341,7 @@
       revisao:    { nome:'Revisão ortográfica e gramatical', valor:400.00, desc:'Correção de ortografia, gramática, pontuação e concordância.' },
       preparacao: { nome:'Preparação textual', valor:250.00, desc:'Padronização de elementos do texto, remoção de marcações acadêmicas e ajustes técnicos.' },
       diagramacao:{ nome:'Diagramação', valor:400.00, desc:'Organização visual das páginas, fontes, margens, sumário, cabeçalhos e rodapés.' },
-      capa:       { nome:'Criação de capa e contracapa', valor:250.00, desc:'Desenvolvimento gráfico da capa (frente, lombada e verso) com título e nome do autor.' },
+      capa:       { nome:'Criação de capa e contracapa', valor:250.00, desc:'Desenvolvimento da capa (frente, lombada e verso) com título e nome do autor.' },
       epub:       { nome:'Conversão para EPUB/MOBI', valor:150.00, desc:'Conversão do livro para formatos compatíveis com Kindle e Kobo.' },
       ficha:      { nome:'Ficha catalográfica e ISBN', valor:150.00, desc:'Elaboração da ficha catalográfica e emissão do número ISBN.' },
       registro:   { nome:'Registro de direitos autorais', valor:30.00,  desc:'Registro da obra na Biblioteca Nacional ou órgão equivalente.' }
@@ -419,43 +382,35 @@
       reader.readAsDataURL(f);
     });
 
-    // Inputs que re-renderizam
-    el('pacote').addEventListener('change', () => { buildSuboptions(); renderMain(); });
-    document.addEventListener('input', (e) => {
-      const ids = ['empresa','cnpj','cliente','validade','titulo','autor','obs','combo'];
-      if (ids.includes(e.target.id)) renderMain();
-      const ids7 = ['cliente7','validade7','titulo7','autor7','obs7'];
-      if (ids7.includes(e.target.id) || e.target.classList.contains('svcChk7')) renderServicos();
-    });
+    // Subopções do pacote
+    el('pacote').addEventListener('change', buildSuboptions);
 
     // Botões principal
-    el('btnAtualizar').addEventListener('click', renderMain);
-    el('btnAddPage').addEventListener('click', () => { renderMain(); addPageToStack(); });
-    el('btnClearStack').addEventListener('click', clearStack);
-    el('btnPDFsingle').addEventListener('click', async () => {
-      renderMain(); await ensureHtml2pdf();
-      const opt = { margin:[10,10,10,10], filename:`Orcamento_Livro_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['avoid-all','css','legacy']} };
-      window.html2pdf().set(opt).from(document.getElementById('orcamento')).save();
-    });
-    el('btnPDFstack').addEventListener('click', async () => {
-      if (stackCount===0) { alert('Adicione ao menos uma página à pilha.'); return; }
-      await ensureHtml2pdf();
-      const opt = { margin:[10,10,10,10], filename:`Orcamento_Livro_MULTIPAG_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
-      window.html2pdf().set(opt).from(document.getElementById('pdfStack')).save();
-    });
+    el('btnAddItem').addEventListener('click', addItem);
+    el('btnClearItems').addEventListener('click', () => { el('items').innerHTML=''; });
+    el('btnPDFall').addEventListener('click', genPDFAll);
 
-    // Botões serviços
-    el('btnAtualizar7').addEventListener('click', renderServicos);
-    el('btnPDF7').addEventListener('click', async () => {
+    // Serviços
+    document.getElementById('selTodos7').addEventListener('change', (e) => {
+      const on = e.target.checked; document.querySelectorAll('.svcChk7').forEach(cb => cb.checked = on); renderServicos();
+    });
+    document.addEventListener('input', (e) => {
+      const ids7 = ['cliente7','validade7','titulo7','autor7','obs7'];
+      if (ids7.includes(e.target.id) || e.target.classList.contains('svcChk7')) renderServicos();
+      // Atualiza o cabeçalho do bloco principal quando mudar meta‑info
+      if (['empresa','cnpj','cliente','validade','titulo','autor'].includes(e.target.id)) headerInfoToPreview();
+    });
+    document.getElementById('btnAtualizar7').addEventListener('click', renderServicos);
+    document.getElementById('btnPDF7').addEventListener('click', async () => {
       const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; }
       await ensureHtml2pdf();
-      const opt = { margin:[10,10,10,10], filename:`Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['avoid-all','css','legacy']} };
+      const opt = { margin:[10,10,10,10], filename:`Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
       window.html2pdf().set(opt).from(document.getElementById('orc-servicos')).save();
     });
 
     // Inicialização
     buildSuboptions();
-    renderMain();
+    headerInfoToPreview();
     renderServicos();
   </script>
 </body>
