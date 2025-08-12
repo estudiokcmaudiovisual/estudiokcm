@@ -32,9 +32,16 @@
     button.secondary { background:#555; }
     button.soft { background:#888; }
 
-    /* ===== A4 PREVIEW (fixo) ===== */
+    /* ===== A4 PREVIEW (fixo + pager) ===== */
     .a4-wrap { display:flex; justify-content:center; }
-    .a4 { width:794px; min-height:1123px; background:#fff; border:1px solid var(--line); padding:18px; display:flex; flex-direction:column; }
+    .a4 { width:794px; height:1123px; background:#fff; border:1px solid var(--line); padding:18px; display:flex; flex-direction:column; overflow:auto; }
+    /* esconder scrollbar sem quebrar o scroll programático */
+    .a4::-webkit-scrollbar { width:0; height:0; }
+
+    .pager { display:none; justify-content:space-between; align-items:center; gap:8px; margin:8px 0 0; }
+    .pager .info { font-size:12px; color:#666; }
+    .pager .btnPager { background:#f7f7f7; color:#111; border:1px solid var(--line); padding:6px 10px; cursor:pointer; }
+    .pager .btnPager:disabled { opacity:.4; cursor:not-allowed; }
 
     .doc-header { display:flex; align-items:center; gap:16px; border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:10px; }
     .doc-header .logos img { width:70px; height:70px; }
@@ -76,7 +83,7 @@
     </div>
     <div class="header-text">
       <h1>Calculadora de Orçamento – Multi‑pacotes</h1>
-      <div class="sub">Pré‑visualização fixa em A4 à direita. Pacotes 1–6 empilhados + Serviços (7) separado. Logo 1 (BASE64) + Logo 2 (upload).</div>
+      <div class="sub">Pré‑visualização fixa em A4 à direita com navegação de páginas. Pacotes 1–6 empilhados + Serviços (7) separado. Logo 1 (BASE64) + Logo 2 (upload).</div>
     </div>
   </header>
 
@@ -156,29 +163,36 @@
         </div>
 
         <!-- PRÉVIA A4 DIREITA -->
-        <div class="a4-wrap">
-          <div id="a4-principal" class="a4">
-            <div class="doc-header">
-              <div class="logos">
-                <img id="pdfLogo1_top" alt="Logo base64" />
-                <img id="pdfLogo2_top" alt="Logo adicional" />
+        <div>
+          <div class="a4-wrap">
+            <div id="a4-principal" class="a4">
+              <div class="doc-header">
+                <div class="logos">
+                  <img id="pdfLogo1_top" alt="Logo base64" />
+                  <img id="pdfLogo2_top" alt="Logo adicional" />
+                </div>
+                <div class="htxt">
+                  <h3>ORÇAMENTOS DE PRODUÇÃO DE LIVRO (Pacotes 1–6)</h3>
+                  <p id="empresaLinha">—</p>
+                  <p id="validadeLinha" class="muted">Validade: —</p>
+                </div>
               </div>
-              <div class="htxt">
-                <h3>ORÇAMENTOS DE PRODUÇÃO DE LIVRO (Pacotes 1–6)</h3>
-                <p id="empresaLinha">—</p>
-                <p id="validadeLinha" class="muted">Validade: —</p>
+              <div class="kv">
+                <div><strong>Cliente:</strong><span id="kvCliente">—</span></div>
+                <div><strong>Data:</strong><span id="kvData">—</span></div>
+                <div><strong>Título:</strong><span id="kvTitulo">—</span></div>
+                <div><strong>Autor(a):</strong><span id="kvAutor">—</span></div>
               </div>
+              <div id="items"></div>
+              <div style="margin-top:8px"><strong>Descrição / Observações gerais:</strong></div>
+              <div id="obsDocPreview" class="doc-obs"></div>
+              <div class="doc-footer">KCM Audiovisual • Emerson Mas • Contato: (83) 99689‑3360</div>
             </div>
-            <div class="kv">
-              <div><strong>Cliente:</strong><span id="kvCliente">—</span></div>
-              <div><strong>Data:</strong><span id="kvData">—</span></div>
-              <div><strong>Título:</strong><span id="kvTitulo">—</span></div>
-              <div><strong>Autor(a):</strong><span id="kvAutor">—</span></div>
-            </div>
-            <div id="items"></div>
-            <div style="margin-top:8px"><strong>Descrição / Observações gerais:</strong></div>
-            <div id="obsDocPreview" class="doc-obs"></div>
-            <div class="doc-footer">KCM Audiovisual • Emerson Mas • Contato: (83) 99689‑3360</div>
+          </div>
+          <div class="pager" id="pager-principal">
+            <button id="prev-principal" class="btnPager">◀ Página anterior</button>
+            <span class="info" id="info-principal">Página 1 de 1</span>
+            <button id="next-principal" class="btnPager">Próxima página ▶</button>
           </div>
         </div>
       </div>
@@ -237,39 +251,46 @@
         </div>
 
         <!-- PRÉVIA A4 DIREITA -->
-        <div class="a4-wrap">
-          <div id="a4-servicos" class="a4">
-            <div class="doc-header">
-              <div class="logos">
-                <img id="pdfLogo1_serv" alt="Logo base64" />
-                <img id="pdfLogo2_serv" alt="Logo adicional" />
+        <div>
+          <div class="a4-wrap">
+            <div id="a4-servicos" class="a4">
+              <div class="doc-header">
+                <div class="logos">
+                  <img id="pdfLogo1_serv" alt="Logo base64" />
+                  <img id="pdfLogo2_serv" alt="Logo adicional" />
+                </div>
+                <div class="htxt">
+                  <h3>ORÇAMENTO DE SERVIÇOS EDITORIAIS (Pacote 7)</h3>
+                  <p id="empresaLinha7">—</p>
+                  <p id="validadeLinha7" class="muted">Validade: —</p>
+                </div>
               </div>
-              <div class="htxt">
-                <h3>ORÇAMENTO DE SERVIÇOS EDITORIAIS (Pacote 7)</h3>
-                <p id="empresaLinha7">—</p>
-                <p id="validadeLinha7" class="muted">Validade: —</p>
+              <div class="kv">
+                <div><strong>Cliente:</strong><span id="kvCliente7">—</span></div>
+                <div><strong>Data:</strong><span id="kvData7">—</span></div>
+                <div><strong>Título (opcional):</strong><span id="kvTitulo7">—</span></div>
+                <div><strong>Autor(a) (opcional):</strong><span id="kvAutor7">—</span></div>
               </div>
+              <table>
+                <thead>
+                  <tr><th style="width:45%">Serviço</th><th style="width:35%">Descrição</th><th style="width:20%">Valor (R$)</th></tr>
+                </thead>
+                <tbody id="tbody7"></tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="2" style="text-align:right">TOTAL</td>
+                    <td id="tdTotal7">R$ 0,00</td>
+                  </tr>
+                </tfoot>
+              </table>
+              <p class="muted" id="obsLinha7" style="margin-top:10px"></p>
+              <div class="doc-footer">KCM Audiovisual • Emerson Mas • Contato: (83) 99689‑3360</div>
             </div>
-            <div class="kv">
-              <div><strong>Cliente:</strong><span id="kvCliente7">—</span></div>
-              <div><strong>Data:</strong><span id="kvData7">—</span></div>
-              <div><strong>Título (opcional):</strong><span id="kvTitulo7">—</span></div>
-              <div><strong>Autor(a) (opcional):</strong><span id="kvAutor7">—</span></div>
-            </div>
-            <table>
-              <thead>
-                <tr><th style="width:45%">Serviço</th><th style="width:35%">Descrição</th><th style="width:20%">Valor (R$)</th></tr>
-              </thead>
-              <tbody id="tbody7"></tbody>
-              <tfoot>
-                <tr>
-                  <td colspan="2" style="text-align:right">TOTAL</td>
-                  <td id="tdTotal7">R$ 0,00</td>
-                </tr>
-              </tfoot>
-            </table>
-            <p class="muted" id="obsLinha7" style="margin-top:10px"></p>
-            <div class="doc-footer">KCM Audiovisual • Emerson Mas • Contato: (83) 99689‑3360</div>
+          </div>
+          <div class="pager" id="pager-servicos">
+            <button id="prev-servicos" class="btnPager">◀ Página anterior</button>
+            <span class="info" id="info-servicos">Página 1 de 1</span>
+            <button id="next-servicos" class="btnPager">Próxima página ▶</button>
           </div>
         </div>
       </div>
@@ -302,6 +323,8 @@
   </script>
 
   <script>
+    const PAGE_PX = 1123;
+
     // ===================== DADOS PRINCIPAIS (1–6) =====================
     const PRICING = {
       1: { label: '1) Ebook (PDF) + Distribuição Digital', total: 1200.00, material: 'Ebook (PDF); capa frente; revisão; ficha/ISBN; distribuição digital.' },
@@ -354,6 +377,7 @@
       // logos topo
       el('pdfLogo1_top').src = el('pdfLogo1').src;
       el('pdfLogo2_top').src = el('pdfLogo2').src;
+      updatePager('principal');
     }
 
     let itemCount = 0;
@@ -384,6 +408,7 @@
         </table>
       `;
       el('items').appendChild(item);
+      updatePager('principal');
     }
 
     // Remoção via delegação
@@ -392,16 +417,23 @@
         const id = e.target.getAttribute('data-id');
         const node = document.getElementById(id);
         if (node) node.remove();
+        updatePager('principal');
       }
     });
+
+    function withExpandedNode(node, fn) {
+      const prevH = node.style.height, prevO = node.style.overflow, prevST = node.scrollTop;
+      node.style.height = 'auto'; node.style.overflow = 'visible'; node.scrollTop = 0;
+      return Promise.resolve(fn()).finally(() => { node.style.height = '1123px'; node.style.overflow = 'auto'; node.scrollTop = prevST; });
+    }
 
     async function genPDFAll() {
       headerInfoToPreview();
       await ensureHtml2pdf();
       const node = document.getElementById('a4-principal');
       await waitForImages(node);
-      const opt = { margin:[10,10,10,10], filename:`Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true,scrollY:0}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
-      window.html2pdf().set(opt).from(node).save();
+      const opt = { margin:[10,10,10,10], filename:`Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true,scrollY:0,letterRendering:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
+      await withExpandedNode(node, () => window.html2pdf().set(opt).from(node).save());
     }
 
     // ===================== SERVIÇOS (7) =====================
@@ -437,8 +469,9 @@
         tr.innerHTML = `<td>${s.nome}</td><td>${s.desc}</td><td>${(s.valor).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</td>`;
         tbody.appendChild(tr); total += s.valor;
       });
-      el('tdTotal7').textContent = total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+      el('tdTotal7').textContent = total.toLocaleString('pt-BR',{style:'currency','currencyDisplay':'symbol'});
       el('obsLinha7').textContent = el('obs7').value.trim();
+      updatePager('servicos');
       return any;
     }
 
@@ -448,25 +481,56 @@
       if (data && data.startsWith('data:image')) {
         el('pdfLogo1').src = data; el('pdfLogo1_top').src = data; el('pdfLogo1_serv').src = data;
       }
+      updatePager('principal'); updatePager('servicos');
     }
     document.getElementById('logo2Input').addEventListener('change', (ev) => {
       const f = ev.target.files?.[0]; if (!f) return;
       const reader = new FileReader();
       reader.onload = () => {
-        const src = reader.result; el('pdfLogo2').src = src; el('pdfLogo2_top').src = src; el('pdfLogo2_serv').src = src;
+        const src = reader.result; el('pdfLogo2').src = src; el('pdfLogo2_top').src = src; el('pdfLogo2_serv').src = src; updatePager('principal'); updatePager('servicos');
       };
       reader.readAsDataURL(f);
     });
 
+    // ===================== Pager =====================
+    function updatePager(which) {
+      const box = which === 'principal' ? el('a4-principal') : el('a4-servicos');
+      const pager = which === 'principal' ? el('pager-principal') : el('pager-servicos');
+      const info = which === 'principal' ? el('info-principal') : el('info-servicos');
+      const prev = which === 'principal' ? el('prev-principal') : el('prev-servicos');
+      const next = which === 'principal' ? el('next-principal') : el('next-servicos');
+      if (!box) return;
+      const total = Math.max(1, Math.ceil(box.scrollHeight / PAGE_PX));
+      if (total > 1) pager.style.display = 'flex'; else pager.style.display = 'none';
+      let idx = parseInt(box.dataset.pageIndex || '0', 10);
+      if (idx >= total) idx = total - 1;
+      box.dataset.pageIndex = String(idx);
+      info.textContent = `Página ${idx + 1} de ${total}`;
+      prev.disabled = idx === 0; next.disabled = idx === total - 1;
+    }
+    function goToPage(which, dir) {
+      const box = which === 'principal' ? el('a4-principal') : el('a4-servicos');
+      let idx = parseInt(box.dataset.pageIndex || '0', 10);
+      const total = Math.max(1, Math.ceil(box.scrollHeight / PAGE_PX));
+      idx = Math.min(Math.max(idx + dir, 0), total - 1);
+      box.dataset.pageIndex = String(idx);
+      box.scrollTo({ top: idx * PAGE_PX, behavior: 'smooth' });
+      updatePager(which);
+    }
+    el('prev-principal').addEventListener('click', () => goToPage('principal', -1));
+    el('next-principal').addEventListener('click', () => goToPage('principal', 1));
+    el('prev-servicos').addEventListener('click', () => goToPage('servicos', -1));
+    el('next-servicos').addEventListener('click', () => goToPage('servicos', 1));
+
     // ===================== Eventos =====================
     el('pacote').addEventListener('change', buildSuboptions);
     el('btnAddItem').addEventListener('click', addItem);
-    el('btnClearItems').addEventListener('click', () => { el('items').innerHTML=''; itemCount=0; });
+    el('btnClearItems').addEventListener('click', () => { el('items').innerHTML=''; itemCount=0; updatePager('principal'); });
     el('btnPDFall').addEventListener('click', genPDFAll);
 
     document.getElementById('selTodos7').addEventListener('change', (e) => { const on = e.target.checked; document.querySelectorAll('.svcChk7').forEach(cb => cb.checked = on); renderServicos(); });
     document.getElementById('btnAtualizar7').addEventListener('click', renderServicos);
-    document.getElementById('btnPDF7').addEventListener('click', async () => { const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; } await ensureHtml2pdf(); const node = document.getElementById('a4-servicos'); await waitForImages(node); const opt = { margin:[10,10,10,10], filename:`Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true,scrollY:0}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} }; window.html2pdf().set(opt).from(node).save(); });
+    document.getElementById('btnPDF7').addEventListener('click', async () => { const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; } await ensureHtml2pdf(); const node = document.getElementById('a4-servicos'); await waitForImages(node); const opt = { margin:[10,10,10,10], filename:`Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true,scrollY:0,letterRendering:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} }; await withExpandedNode(node, () => window.html2pdf().set(opt).from(node).save()); });
 
     document.addEventListener('input', (e) => {
       if (['empresa','cnpj','cliente','validade','titulo','autor','dataDoc','obsDoc'].includes(e.target.id)) headerInfoToPreview();
@@ -481,6 +545,8 @@
     buildSuboptions();
     headerInfoToPreview();
     renderServicos();
+    updatePager('principal');
+    updatePager('servicos');
   </script>
 </body>
 </html>
