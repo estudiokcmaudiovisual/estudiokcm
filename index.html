@@ -9,7 +9,8 @@
     * { box-sizing: border-box; }
     body { font-family: Arial, Helvetica, sans-serif; margin: 0; background: #f6f6f6; color:#111; }
     header { background:#fff; border-bottom:1px solid var(--line); padding: 16px 20px; display:flex; gap:16px; align-items:center; position:sticky; top:0; z-index:1; }
-    #logo { width: 90px; height: 90px; object-fit: contain; border:1px dashed #bbb; background:#fafafa; }
+    .logos { display:flex; gap:10px; align-items:center; }
+    .logos img { width: 90px; height: 90px; object-fit: contain; border:1px solid #eee; background:#fafafa; }
     .header-text { display:flex; flex-direction:column; gap:2px; }
     .header-text h1 { margin:0; font-size: 18px; letter-spacing: .3px; }
     .header-text .sub { color:var(--muted); font-size: 12px; }
@@ -25,11 +26,11 @@
     button { background:#111; color:#fff; border:0; padding:10px 14px; font-size:13px; cursor:pointer; }
     button.secondary { background:#555; }
     button.soft { background:#888; }
+    button.link { background:transparent; color:#111; border:1px solid var(--line); }
 
     /* Quadros exportáveis (PDF) */
     .export-box { background:#fff; border:1px solid var(--line); padding:20px; }
     .orc-doc-header { display:flex; align-items:center; gap:16px; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:12px; }
-    .orc-doc-header img { width:90px; height:90px; object-fit:contain; border:1px solid #eee; background:#fafafa; }
     .orc-doc-header .htxt h3 { margin:0; font-size:18px; }
     .orc-doc-header .htxt p { margin:2px 0; color:var(--muted); font-size:12px; }
 
@@ -43,19 +44,26 @@
     tfoot td { font-weight:bold; }
     .muted { color:var(--muted); font-size:11px; }
 
-    .orc-item { border:1px solid var(--line); padding:12px; margin: 14px 0; background:#fff; }
+    .orc-item { border:1px solid var(--line); padding:12px; margin: 14px 0; background:#fff; position:relative; }
     .orc-item h4 { margin:0 0 6px 0; font-size:13px; }
     .obs-box { border:1px solid #bbb; min-height:60px; padding:8px; white-space: pre-wrap; }
+    .rm { position:absolute; top:8px; right:8px; font-size:12px; padding:4px 8px; border:1px solid #ccc; background:#fff; cursor:pointer; }
+
+    /* Evitar quebras no meio dos blocos no PDF */
+    .orc-item, .orc-item table, .orc-item h4, .obs-box { page-break-inside: avoid; break-inside: avoid; }
 
     @media print { header, .controls { display:none !important; } body { background:#fff; } }
   </style>
 </head>
 <body>
   <header class="controls">
-    <img id="logo" alt="Logo" />
+    <div class="logos">
+      <img id="pdfLogo1" alt="Logo base64" />
+      <img id="pdfLogo2" alt="Logo adicional" />
+    </div>
     <div class="header-text">
       <h1>Calculadora de Orçamento – Multi‑pacotes</h1>
-      <div class="sub">Pacotes 1–6 (principal) exibidos um abaixo do outro no PDF + Serviços (Pacote 7) separado.</div>
+      <div class="sub">Pacotes 1–6 empilhados em um único PDF + Serviços (Pacote 7) separado. Logo 1 (BASE64 fixa) + Logo 2 (upload).</div>
     </div>
   </header>
 
@@ -63,28 +71,39 @@
     <!-- ===================== CALCULADORA PRINCIPAL (1–6) ===================== -->
     <section class="controls" id="ctrl-main">
       <h2>Configurações – Pacotes 1–6</h2>
-      <label for="logoInput">Logo (PNG/JPG)</label>
-      <input id="logoInput" type="file" accept="image/*" />
 
+      <label for="logoBase64">Logo 1 (BASE64 Data URL)</label>
+      <textarea id="logoBase64" placeholder="Cole aqui sua logo como Data URL base64 (ex.: data:image/png;base64,...)" style="font-family: monospace; min-height:70px"></textarea>
       <div class="row">
+        <div>
+          <label for="logo2Input">Logo 2 (PNG/JPG)</label>
+          <input id="logo2Input" type="file" accept="image/*" />
+        </div>
         <div>
           <label for="empresa">Empresa/Produtor</label>
           <input id="empresa" type="text" placeholder="Ex.: Estúdio KCM / Seu nome" />
-        </div>
-        <div>
-          <label for="cnpj">CNPJ/CPF (opcional)</label>
-          <input id="cnpj" type="text" placeholder="Ex.: 00.000.000/0001-00" />
         </div>
       </div>
 
       <div class="row">
         <div>
+          <label for="cnpj">CNPJ/CPF (opcional)</label>
+          <input id="cnpj" type="text" placeholder="Ex.: 00.000.000/0001-00" />
+        </div>
+        <div>
           <label for="cliente">Cliente</label>
           <input id="cliente" type="text" placeholder="Nome do cliente" />
         </div>
+      </div>
+
+      <div class="row">
         <div>
           <label for="validade">Validade do orçamento (dias)</label>
           <input id="validade" type="number" value="30" />
+        </div>
+        <div>
+          <label for="dataDoc">Data do documento</label>
+          <input id="dataDoc" type="text" placeholder="auto" />
         </div>
       </div>
 
@@ -111,13 +130,13 @@
 
       <div id="suboptions"></div>
 
-      <label for="obsAtual">Observações deste pacote (irá no retângulo)</label>
+      <label for="obsAtual">Observações deste pacote (retângulo)</label>
       <textarea id="obsAtual" placeholder="Observações, descrições, condições específicas deste pacote."></textarea>
 
       <div class="btns">
-        <button id="btnAddItem">Adicionar pacote à pré‑visualização</button>
+        <button id="btnAddItem">Adicionar pacote</button>
         <button id="btnClearItems" class="soft">Limpar lista</button>
-        <button id="btnPDFall" class="secondary">Gerar PDF (todos os pacotes adicionados)</button>
+        <button id="btnPDFall" class="secondary">Gerar PDF (todos os pacotes)</button>
       </div>
     </section>
 
@@ -125,7 +144,10 @@
       <h2>Pré‑visualização – Pacotes 1–6 (empilhados)</h2>
       <div id="orcamentoStack" class="export-box">
         <div class="orc-doc-header">
-          <img id="pdfLogo" alt="Logo" />
+          <div class="logos">
+            <img id="pdfLogo1_top" alt="Logo base64" />
+            <img id="pdfLogo2_top" alt="Logo adicional" />
+          </div>
           <div class="htxt">
             <h3>ORÇAMENTOS DE PRODUÇÃO DE LIVRO (Pacotes 1–6)</h3>
             <p id="empresaLinha">—</p>
@@ -195,7 +217,10 @@
       <h2>Pré‑visualização – Serviços (Pacote 7)</h2>
       <div id="orc-servicos" class="export-box">
         <div class="orc-doc-header">
-          <img id="pdfLogo7" alt="Logo" />
+          <div class="logos">
+            <img id="pdfLogo1_serv" alt="Logo base64" />
+            <img id="pdfLogo2_serv" alt="Logo adicional" />
+          </div>
           <div class="htxt">
             <h3>ORÇAMENTO DE SERVIÇOS EDITORIAIS (Pacote 7)</h3>
             <p id="empresaLinha7">—</p>
@@ -284,6 +309,7 @@
       }
     }
 
+    // Cabeçalho comum
     function headerInfoToPreview() {
       const empresa = el('empresa').value.trim() || '—';
       const cnpj = el('cnpj').value.trim(); // opcional
@@ -292,9 +318,14 @@
       el('kvTitulo').textContent = el('titulo').value.trim() || '—';
       el('kvAutor').textContent = el('autor').value.trim() || '—';
       el('kvCliente').textContent = el('cliente').value.trim() || '—';
-      el('kvData').textContent = new Date().toLocaleDateString('pt-BR');
+      const dataVal = el('dataDoc').value.trim() || new Date().toLocaleDateString('pt-BR');
+      el('kvData').textContent = dataVal;
+      // logos no topo
+      el('pdfLogo1_top').src = el('pdfLogo1').src;
+      el('pdfLogo2_top').src = el('pdfLogo2').src;
     }
 
+    let itemCount = 0;
     function addItem() {
       headerInfoToPreview();
       const p = parseInt(el('pacote').value, 10);
@@ -310,10 +341,12 @@
         tituloPacote += ' — ' + opt.label; detalhes = opt.material; total = opt.total;
       }
 
+      const id = `item-${++itemCount}`;
       const item = document.createElement('div');
-      item.className = 'orc-item';
+      item.className = 'orc-item'; item.id = id;
       item.innerHTML = `
-        <h4>${tituloPacote}</h4>
+        <button class="rm" data-id="${id}" title="Remover pacote">Remover</button>
+        <h4><strong>${itemCount}.</strong> ${tituloPacote}</h4>
         <table>
           <thead><tr><th style="width:50%">Descrição</th><th style="width:25%">Detalhes</th><th style="width:25%">Valor (R$)</th></tr></thead>
           <tbody><tr><td>${tituloPacote}</td><td>${detalhes}</td><td>${fmt(total)}</td></tr></tbody>
@@ -323,9 +356,6 @@
         <div class="obs-box">${obsTxt ? obsTxt.replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''}</div>
       `;
       el('items').appendChild(item);
-
-      // limpa observação atual (opcional)
-      // el('obsAtual').value = '';
     }
 
     async function genPDFAll() {
@@ -334,6 +364,15 @@
       const opt = { margin:[10,10,10,10], filename:`Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
       window.html2pdf().set(opt).from(document.getElementById('orcamentoStack')).save();
     }
+
+    // Remoção via delegação
+    document.getElementById('items').addEventListener('click', (e) => {
+      if (e.target.classList.contains('rm')) {
+        const id = e.target.getAttribute('data-id');
+        const node = document.getElementById(id);
+        if (node) node.remove();
+      }
+    });
 
     // ===================== SERVIÇOS (7) =====================
     const SERVICOS = {
@@ -357,6 +396,10 @@
       el('kvAutor7').textContent = el('autor7').value.trim() || '—';
       el('kvData7').textContent = new Date().toLocaleDateString('pt-BR');
 
+      // sincronizar logos
+      el('pdfLogo1_serv').src = el('pdfLogo1').src;
+      el('pdfLogo2_serv').src = el('pdfLogo2').src;
+
       const tbody = el('tbody7'); tbody.innerHTML = '';
       let total = 0; let any = false;
       document.querySelectorAll('.svcChk7').forEach(cb => {
@@ -371,44 +414,50 @@
       return any;
     }
 
-    // ===================== Eventos globais =====================
-    // Logo para ambas as prévias
-    document.getElementById('logoInput').addEventListener('change', (ev) => {
+    // ===================== Logos =====================
+    function applyLogos() {
+      // Base64 principal
+      const data = el('logoBase64').value.trim();
+      if (data && data.startsWith('data:image')) {
+        el('pdfLogo1').src = data; el('pdfLogo1_top').src = data; el('pdfLogo1_serv').src = data;
+      }
+    }
+
+    // Logo 2 (upload)
+    document.getElementById('logo2Input').addEventListener('change', (ev) => {
       const f = ev.target.files?.[0]; if (!f) return;
       const reader = new FileReader();
       reader.onload = () => {
-        const src = reader.result; el('logo').src = src; el('pdfLogo').src = src; el('pdfLogo7').src = src;
+        const src = reader.result; el('pdfLogo2').src = src; el('pdfLogo2_top').src = src; el('pdfLogo2_serv').src = src;
       };
       reader.readAsDataURL(f);
     });
 
+    // ===================== Eventos globais =====================
     // Subopções do pacote
     el('pacote').addEventListener('change', buildSuboptions);
 
     // Botões principal
     el('btnAddItem').addEventListener('click', addItem);
-    el('btnClearItems').addEventListener('click', () => { el('items').innerHTML=''; });
-    el('btnPDFall').addEventListener('click', genPDFAll);
+    el('btnClearItems').addEventListener('click', () => { el('items').innerHTML=''; itemCount=0; });
+    el('btnPDFall').addEventListener('click', async () => { headerInfoToPreview(); await ensureHtml2pdf(); const opt = { margin:[10,10,10,10], filename:`Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} }; window.html2pdf().set(opt).from(document.getElementById('orcamentoStack')).save(); });
 
     // Serviços
-    document.getElementById('selTodos7').addEventListener('change', (e) => {
-      const on = e.target.checked; document.querySelectorAll('.svcChk7').forEach(cb => cb.checked = on); renderServicos();
-    });
-    document.addEventListener('input', (e) => {
-      const ids7 = ['cliente7','validade7','titulo7','autor7','obs7'];
-      if (ids7.includes(e.target.id) || e.target.classList.contains('svcChk7')) renderServicos();
-      // Atualiza o cabeçalho do bloco principal quando mudar meta‑info
-      if (['empresa','cnpj','cliente','validade','titulo','autor'].includes(e.target.id)) headerInfoToPreview();
-    });
+    document.getElementById('selTodos7').addEventListener('change', (e) => { const on = e.target.checked; document.querySelectorAll('.svcChk7').forEach(cb => cb.checked = on); renderServicos(); });
     document.getElementById('btnAtualizar7').addEventListener('click', renderServicos);
-    document.getElementById('btnPDF7').addEventListener('click', async () => {
-      const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; }
-      await ensureHtml2pdf();
-      const opt = { margin:[10,10,10,10], filename:`Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
-      window.html2pdf().set(opt).from(document.getElementById('orc-servicos')).save();
+    document.getElementById('btnPDF7').addEventListener('click', async () => { const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; } await ensureHtml2pdf(); const opt = { margin:[10,10,10,10], filename:`Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} }; window.html2pdf().set(opt).from(document.getElementById('orc-servicos')).save(); });
+
+    // Atualizações de cabeçalho/kv
+    document.addEventListener('input', (e) => {
+      if (['empresa','cnpj','cliente','validade','titulo','autor','dataDoc'].includes(e.target.id)) headerInfoToPreview();
+      if (e.target.id === 'logoBase64') applyLogos();
     });
 
     // Inicialização
+    // Base64 padrão: pixel transparente (pode trocar pela sua logo base64)
+    const defaultPixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO1l2bQAAAAASUVORK5CYII=';
+    el('logoBase64').value = defaultPixel;
+    applyLogos();
     buildSuboptions();
     headerInfoToPreview();
     renderServicos();
