@@ -5,32 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calculadora de Orçamento – Multi‑pacotes (1–6) + Serviços (7)</title>
   <style>
-    :root { --accent:#111; --muted:#666; --line:#ddd; }
+    :root { --accent:#111; --muted:#5f6368; --line:#dcdfe3; --head:#f3f4f6; --zebra:#fbfbfc; }
     * { box-sizing: border-box; }
     html, body { height:100%; }
-    body { font-family: Arial, Helvetica, sans-serif; margin: 0; background: #f6f6f6; color:#111; }
+    body { font-family: Arial, Helvetica, sans-serif; margin: 0; background: #f6f7f9; color:#111; }
 
     header { background:#fff; border-bottom:1px solid var(--line); padding: 12px 16px; display:flex; gap:16px; align-items:center; position:sticky; top:0; z-index:1; }
     .logos { display:flex; gap:10px; align-items:center; }
     .logos img { width: 80px; height: 80px; object-fit: contain; border:1px solid #eee; background:#fafafa; }
     .header-text { display:flex; flex-direction:column; gap:2px; }
-    .header-text h1 { margin:0; font-size: 18px; letter-spacing: .3px; }
+    .header-text h1 { margin:0; font-size: 18px; letter-spacing: .2px; }
     .header-text .sub { color:var(--muted); font-size: 12px; }
 
-    main { max-width: 1300px; margin: 0 auto; padding: 16px; display:flex; flex-direction:column; gap: 16px; }
+    main { max-width: 1320px; margin: 0 auto; padding: 16px; display:flex; flex-direction:column; gap: 16px; }
     section { background:#fff; border:1px solid var(--line); }
-    section h2 { margin:0; padding:12px 12px 0; font-size: 14px; letter-spacing:.3px; color:#333; }
+    section h2 { margin:0; padding:12px 12px 0; font-size: 14px; letter-spacing:.3px; color:#2b2f36; }
     .pane { display:grid; grid-template-columns: minmax(360px, 1fr) 820px; gap: 12px; align-items:start; padding: 12px; }
 
     /* ===== Form ===== */
-    label { display:block; font-size:12px; color:#333; margin:8px 0 4px; }
-    input[type="text"], input[type="number"], select, textarea { width:100%; padding:8px; border:1px solid var(--line); font-size: 13px; background:#fff; }
-    textarea { min-height: 84px; resize: vertical; }
+    label { display:block; font-size:12px; color:#2b2f36; margin:8px 0 4px; }
+    input[type="text"], input[type="number"], select, textarea { width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:4px; font-size: 13px; background:#fff; }
+    textarea { min-height: 94px; resize: vertical; }
     .row { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .btns { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-    button { background:#111; color:#fff; border:0; padding:10px 14px; font-size:13px; cursor:pointer; }
-    button.secondary { background:#555; }
-    button.soft { background:#888; }
+    button { background:#111; color:#fff; border:0; padding:10px 14px; font-size:13px; cursor:pointer; border-radius:6px; }
+    button.secondary { background:#4a4f57; }
+    button.soft { background:#8b90a0; }
     button.ghost { background:#f7f7f7; color:#111; border:1px solid var(--line); }
 
     /* ===== A4 PREVIEW (fixo + pager) ===== */
@@ -40,42 +40,47 @@
 
     .pager { display:none; justify-content:space-between; align-items:center; gap:8px; margin:8px 0 0; }
     .pager .info { font-size:12px; color:#666; }
-    .pager .btnPager { background:#f7f7f7; color:#111; border:1px solid var(--line); padding:6px 10px; cursor:pointer; }
+    .pager .btnPager { background:#f7f7f7; color:#111; border:1px solid var(--line); padding:6px 10px; cursor:pointer; border-radius:4px; }
     .pager .btnPager:disabled { opacity:.4; cursor:not-allowed; }
 
     .doc-header { display:flex; align-items:center; gap:16px; border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:10px; }
     .doc-header .logos img { width:70px; height:70px; }
-    .doc-header .htxt h3 { margin:0; font-size:18px; }
+    .doc-header .htxt h3 { margin:0; font-size:18px; letter-spacing:.2px; }
     .doc-header .htxt p { margin:2px 0; color:var(--muted); font-size:12px; }
 
     .kv { display:grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-bottom: 10px; }
     .kv div { font-size:12px; }
-    .kv strong { display:block; color:#333; }
+    .kv strong { display:block; color:#2b2f36; }
 
     table { width:100%; border-collapse: collapse; margin-top: 8px; }
-    th, td { border:1px solid var(--line); padding:8px; font-size:12px; vertical-align: top; }
-    thead { background:#fafafa; }
-    tfoot td { font-weight:bold; }
+    th, td { border:1px solid var(--line); padding:8px; font-size:12px; vertical-align: top; line-height:1.35; }
+    thead { background:var(--head); }
+    tbody tr:nth-child(odd) { background: var(--zebra); }
+    tfoot td { font-weight:bold; background:#fafafa; }
     .muted { color:var(--muted); font-size:11px; }
 
-    .orc-item { border:1px solid var(--line); padding:10px; margin: 10px 0; background:#fff; position:relative; page-break-inside: avoid; break-inside: avoid; }
-    .orc-item h4 { margin:0 0 6px 0; font-size:13px; }
-    .rm { position:absolute; top:8px; right:8px; font-size:12px; padding:4px 8px; border:1px solid #ccc; background:#fff; cursor:pointer; }
+    .orc-item { border:1px solid var(--line); padding:10px; margin: 10px 0; background:#fff; position:relative; /* permitir dividir item entre páginas */ break-inside:auto; }
+    .orc-item h4 { margin:0 0 8px 0; font-size:13px; letter-spacing:.2px; }
+    .rm { position:absolute; top:8px; right:8px; font-size:12px; padding:4px 8px; border:1px solid #ccc; background:#fff; cursor:pointer; border-radius:4px; }
 
-    .doc-obs { border:1px solid #bbb; min-height:80px; padding:10px; white-space: pre-wrap; margin-top:10px; }
+    .doc-obs { border:1px dashed #b9bec7; min-height:80px; padding:10px; white-space: pre-wrap; margin-top:10px; border-radius:4px; }
 
-    .doc-footer { border-top:1px solid var(--line); padding-top:8px; margin-top:10px; font-size:11px; color:#555; text-align:center; page-break-inside: avoid; break-inside: avoid; }
+    .doc-footer { border-top:1px solid var(--line); padding-top:8px; margin-top:10px; font-size:11px; color:#555; text-align:center; }
 
     /* ===== PDF multipágina estável ===== */
     thead { display: table-header-group; }
     tfoot { display: table-footer-group; }
-    table, tr, td, th, .doc-header, .kv { page-break-inside: avoid; break-inside: avoid; }
+    /* permitir quebra natural de linhas/itens e manter cabeçalhos/tabelas legíveis */
+    table, tr, td, th, .doc-header, .kv { page-break-inside: auto; break-inside: auto; }
 
     @page { size: A4; margin: 10mm; }
     @media print {
       header, .controls, .pager { display:none !important; }
       body { background:#fff; }
       .a4 { width:auto; height:auto; overflow:visible; border:0; padding:10mm; }
+      /* paginação visual mais elegante no PDF */
+      .orc-item { border:1px solid #e5e7eb; }
+      .doc-obs { border-color:#d1d5db; }
     }
   </style>
 </head>
@@ -87,7 +92,7 @@
     </div>
     <div class="header-text">
       <h1>Calculadora de Orçamento – Multi‑pacotes</h1>
-      <div class="sub">Pré‑visualização fixa em A4 à direita com navegação de páginas. Pacotes 1–6 empilhados + Serviços (7) separado. Logo 1 (BASE64) + Logo 2 (upload).</div>
+      <div class="sub">Pré‑visualização fixa em A4 com paginação. Pacotes 1–6 empilhados + Serviços (7) separado. Logo 1 (BASE64) + Logo 2 (upload).</div>
     </div>
   </header>
 
@@ -231,7 +236,7 @@
             </div>
           </div>
 
-          <div style="border:1px solid var(--line); padding:10px; background:#fcfcfc;">
+          <div style="border:1px solid var(--line); padding:10px; background:#fcfcfc; border-radius:4px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
               <strong>Selecione os serviços</strong>
               <label style="display:flex; gap:6px; align-items:center; font-size:12px;"><input type="checkbox" id="selTodos7"/> Selecionar todos (R$ 2.130,00)</label>
@@ -329,11 +334,13 @@
   </script>
 
   <script>
-    // ===== Util: impressão vetorial em nova janela (usa o mesmo CSS) =====
+    // ===== Util: impressão vetorial em nova janela (usa o MESMO CSS e DOM) =====
     function printVector(node, title) {
+      // clona o nó para manter a prévia intacta
+      const clone = node.cloneNode(true);
       const styleTag = document.querySelector('head style');
       const css = styleTag ? styleTag.innerHTML : '';
-      const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>${title}</title><style>${css}\n@media screen { .a4{width:794px;min-height:1123px;} }\n@media print { header,.controls,.pager{display:none!important} body{background:#fff;} .a4{width:auto;height:auto;overflow:visible;border:0;padding:10mm;} }</style></head><body>${node.outerHTML}</body></html>`;
+      const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>${title}</title><style>${css}\n@media screen { .a4{width:794px;min-height:1123px;} }\n@media print { header,.controls,.pager{display:none!important} body{background:#fff;} .a4{width:auto;height:auto;overflow:visible;border:0;padding:10mm;} }</style></head><body>${clone.outerHTML}</body></html>`;
       const w = window.open('', '_blank', 'noopener,noreferrer');
       if (!w) { alert('Permita pop-ups para gerar o PDF.'); return; }
       w.document.open(); w.document.write(html); w.document.close();
@@ -342,9 +349,6 @@
   </script>
 
   <script>
-    let PAGE_STEP_MAIN = 1123; // será atualizado dinamicamente
-    let PAGE_STEP_SERV = 1123;
-
     // ===================== DADOS PRINCIPAIS (1–6) =====================
     const PRICING = {
       1: { label: '1) Ebook (PDF) + Distribuição Digital', total: 1200.00, material: 'Ebook (PDF); capa frente; revisão; ficha/ISBN; distribuição digital.' },
@@ -428,7 +432,7 @@
         </table>
       `;
       el('items').appendChild(item);
-      updatePager('principal');
+      requestAnimationFrame(() => updatePager('principal'));
     }
 
     // Remoção via delegação
@@ -437,7 +441,7 @@
         const id = e.target.getAttribute('data-id');
         const node = document.getElementById(id);
         if (node) node.remove();
-        updatePager('principal');
+        requestAnimationFrame(() => updatePager('principal'));
       }
     });
 
@@ -499,7 +503,7 @@
       });
       el('tdTotal7').textContent = total.toLocaleString('pt-BR',{style:'currency','currencyDisplay':'symbol'});
       el('obsLinha7').textContent = el('obs7').value.trim();
-      updatePager('servicos');
+      requestAnimationFrame(() => updatePager('servicos'));
       return any;
     }
 
@@ -521,7 +525,11 @@
     });
 
     // ===================== Pager (corrigido) =====================
-    function pageMetrics(box) { return { step: box.clientHeight || 1123, total: Math.max(1, Math.ceil(box.scrollHeight / (box.clientHeight || 1123))) }; }
+    function pageMetrics(box) {
+      const step = box.clientHeight || 1123; // altura visível da A4
+      const total = Math.max(1, Math.ceil(box.scrollHeight / step));
+      return { step, total };
+    }
 
     function updatePager(which) {
       const box = which === 'principal' ? el('a4-principal') : el('a4-servicos');
@@ -532,7 +540,7 @@
       if (!box) return;
       const { step, total } = pageMetrics(box);
       if (total > 1) pager.style.display = 'flex'; else pager.style.display = 'none';
-      let idx = Math.round((box.scrollTop || 0) / step);
+      let idx = Math.floor(((box.scrollTop || 0) + 1) / step);
       idx = Math.max(0, Math.min(idx, total - 1));
       box.dataset.pageIndex = String(idx);
       info.textContent = `Página ${idx + 1} de ${total}`;
@@ -544,9 +552,11 @@
       const { step, total } = pageMetrics(box);
       let idx = parseInt(box.dataset.pageIndex || '0', 10);
       idx = Math.min(Math.max(idx + dir, 0), total - 1);
+      const top = Math.min(idx * step, box.scrollHeight - step);
       box.dataset.pageIndex = String(idx);
-      box.scrollTo({ top: Math.round(idx * step), behavior: 'smooth' });
-      updatePager(which);
+      box.scrollTo({ top, behavior: 'smooth' });
+      // atualiza após a animação
+      setTimeout(() => updatePager(which), 320);
     }
 
     function bindScrollPager(which) {
