@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calculadora de Orçamento – Multi-pacotes (1–6) + Serviços (7)</title>
+  <title>SISTEMA DE ORÇAMENTOS PARA PRODUÇÃO DE LIVROS</title>
   <style>
     :root { --accent:#111; --muted:#5f6368; --line:#dcdfe3; --head:#f3f4f6; --zebra:#fbfbfc; }
     * { box-sizing: border-box; }
@@ -13,6 +13,9 @@
     header { background:#fff; border-bottom:1px solid var(--line); padding: 12px 16px; display:flex; gap:16px; align-items:center; position:sticky; top:0; z-index:1; }
     .logos { display:flex; gap:10px; align-items:center; }
     .logos img { width: 80px; height: 80px; object-fit: contain; border:1px solid #eee; background:#fafafa; }
+    /* Esconde logos sem src => segunda logo torna-se realmente opcional */
+    .logos img[src=""], .logos img:not([src]) { display:none; }
+
     .header-text { display:flex; flex-direction:column; gap:2px; }
     .header-text h1 { margin:0; font-size: 18px; letter-spacing: .2px; }
     .header-text .sub { color:var(--muted); font-size: 12px; }
@@ -142,24 +145,25 @@
       <img id="pdfLogo2" alt="Logo adicional" />
     </div>
     <div class="header-text">
-      <h1>Calculadora de Orçamento – Multi-pacotes</h1>
-      <div class="sub">Pré-visualização A4 com paginação. Pacotes 1–6 empilhados + Serviços (7) separado. Logo 1 (BASE64) + Logo 2 (upload).</div>
+      <h1>SISTEMA DE ORÇAMENTOS PARA PRODUÇÃO DE LIVROS</h1>
+      <div class="sub">Pré-visualização A4 com paginação. Pacotes e Serviços. Logo 1 (BASE64) + Logo 2 (opcional).</div>
     </div>
   </header>
 
   <main>
-    <!-- ===================== BLOCO 1: PACOTES 1–6 ===================== -->
+    <!-- ===================== BLOCO 1: PACOTES ===================== -->
     <section>
-      <h2>Pacotes 1–6</h2>
+      <h2>PACOTES</h2>
       <div class="pane">
         <!-- CONTROLES ESQUERDA -->
         <div class="controls">
           <label for="logoBase64">Logo 1 (BASE64 Data URL)</label>
-          <textarea id="logoBase64" placeholder="Cole sua logo como Data URL base64 (ex.: data:image/png;base64,...)" style="font-family: monospace; min-height:70px"></textarea>
+          <textarea id="logoBase64" placeholder="Cole sua logo como Data URL base64 (ex.: data:image/png;base64,...)"
+            style="font-family: monospace; min-height:70px"></textarea>
 
           <div class="row">
             <div>
-              <label for="logo2Input">Logo 2 (PNG/JPG)</label>
+              <label for="logo2Input">Logo 2 (PNG/JPG) — opcional</label>
               <input id="logo2Input" type="file" accept="image/*" />
             </div>
             <div>
@@ -192,23 +196,23 @@
 
           <div class="row">
             <div>
-              <label for="titulo">Título do livro</label>
-              <input id="titulo" type="text" value="História do PSF em Campina Grande" />
+              <label for="titulo">Título do livro (opcional)</label>
+              <input id="titulo" type="text" />
             </div>
             <div>
-              <label for="autor">Autor(a)</label>
-              <input id="autor" type="text" value="Erinaldo Guimarães" />
+              <label for="autor">Autor(a) (opcional)</label>
+              <input id="autor" type="text" />
             </div>
           </div>
 
           <label for="pacote">Pacote a adicionar</label>
           <select id="pacote">
-            <option value="1">1) Ebook (PDF) + Distribuição Digital — R$ 1.200,00</option>
-            <option value="2">2) Ebook (PDF + EPUB/MOBI) + Distribuição Digital — R$ 1.500,00</option>
-            <option value="3">3) Ebook (PDF + Audiobook) + Distribuição Digital — R$ 2.200,00</option>
-            <option value="4">4) Livro Impresso (serviços completos) — Escolher abaixo</option>
-            <option value="5">5) Impresso + Ebook (PDF/EPUB/MOBI) — Escolher abaixo</option>
-            <option value="6">6) Impresso + Ebook + Audiobook — Escolher abaixo</option>
+            <option value="1">1) Ebook (PDF, EPUB ou MOBI) SEM Distribuição Digital — R$ 1.200,00</option>
+            <option value="2">2) Ebook (PDF, EPUB e MOBI) + Distribuição Digital — R$ 1.500,00</option>
+            <option value="3">3) Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital — R$ 2.200,00</option>
+            <option value="4">4) Livro Impresso — Escolher abaixo</option>
+            <option value="5">5) Impresso + Ebook (PDF, EPUB e MOBI) + Distribuição Digital — Escolher abaixo</option>
+            <option value="6">6) Impresso + Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital — Escolher abaixo</option>
           </select>
           <div id="suboptions"></div>
 
@@ -233,7 +237,7 @@
                   <img id="pdfLogo2_top" alt="Logo adicional" />
                 </div>
                 <div class="htxt">
-                  <h3>ORÇAMENTOS DE PRODUÇÃO DE LIVRO (Pacotes 1–6)</h3>
+                  <h3>ORÇAMENTOS DE PRODUÇÃO DE LIVRO (PACOTES)</h3>
                   <p id="empresaLinha">—</p>
                   <p id="validadeLinha" class="muted">Validade: —</p>
                 </div>
@@ -261,7 +265,7 @@
 
     <!-- ===================== BLOCO 2: SERVIÇOS 7 ===================== -->
     <section>
-      <h2>Serviços (Pacote 7)</h2>
+      <h2>SERVIÇOS</h2>
       <div class="pane">
         <!-- CONTROLES ESQUERDA -->
         <div class="controls">
@@ -380,7 +384,7 @@
       clone.style.overflow = 'visible';
 
       const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>${title}</title><style>${css}
-@page{size:A4;margin:10mm;}@media print{header,.controls,.pager{display:none!important}body{background:#fff}.a4{width:auto;height:auto;overflow:visible;border:0;padding:10mm;padding-bottom:26mm}.doc-footer{position:fixed;left:10mm;right:10mm;bottom:10mm;border-top:1px solid #e5e7eb;padding-top:6px;font-size:11px;color:#555;background:#fff;z-index:2}}</style></head><body>${clone.outerHTML}</body></html>`;
+@page{size:A4;margin:10mm;}@media print{header,.controls,.pager{display:none!important}body{background:#fff}.a4{width:auto;height:auto;overflow:visible;border:0;padding:10mm;padding-bottom:26mm}.doc-footer{position:fixed;left:10mm;right:10mm;bottom:10mm;border-top:1px solid #e5e7eb;padding-top:6px;font-size:11px;color:#555;background:#fff;z-index:2}}.logos img[src=""], .logos img:not([src]){display:none}</style></head><body>${clone.outerHTML}</body></html>`;
 
       const iframe = document.createElement('iframe');
       iframe.style.position = 'fixed';
@@ -411,20 +415,20 @@
   <script>
     // ===================== DADOS PRINCIPAIS (1–6) =====================
     const PRICING = {
-      1: { label: '1) Ebook (PDF) + Distribuição Digital', total: 1200.00, material: 'Ebook (PDF); capa frente; revisão; ficha/ISBN; distribuição digital.' },
-      2: { label: '2) Ebook (PDF + EPUB/MOBI) + Distribuição Digital', total: 1500.00, material: 'Ebook PDF + EPUB/MOBI; capa frente; revisão; ficha/ISBN; distribuição digital.' },
-      3: { label: '3) Ebook (PDF + Audiobook) + Distribuição Digital', total: 2200.00, material: 'Ebook (PDF) + audiobook (3–5h); capa frente; revisão; ficha/ISBN; distribuição digital.' },
-      4: { label: '4) Livro Impresso (serviços editoriais completos)', options: [
-            {key:'4-500-eco', label:'500 ex. (Qualidade Econômica)', total: 11827.47, material:'Econômico: 150 págs., capa 2 cores (P&B), gramagem básica.'},
-            {key:'4-500-pre', label:'500 ex. (Qualidade Premium)', total: 15514.37, material:'Premium: 176 págs., capa Triplex 250 g 4x4, miolo Offset 90 g, BOPP fosca, lombada quadrada.'}
+      1: { label: '1) Ebook (PDF, EPUB e MOBI) SEM Distribuição Digital', total: 1200.00, material: 'Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais.' },
+      2: { label: '2) Ebook (PDF, EPUB e MOBI) + Distribuição Digital', total: 1500.00, material: 'Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.' },
+      3: { label: '3) Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital', total: 2200.00, material: 'Ebook (PDF, EPUB e MOBI) + audiobook (3–5h); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.' },
+      4: { label: '4) Livro Impresso', options: [
+            {key:'4-500-eco', label:'500 exemplares (Qualidade Econômica)', total: 11827.47, material:'Econômico: 150 págs., capa 2 cores (P&B), gramagem básica. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais.'},
+            {key:'4-500-pre', label:'1.000 exemplares (Qualidade Premium)', total: 15514.37, material:'Premium: 160 págs., capa Triplex 250 g 4x4, miolo Offset 90 g, BOPP fosca, lombada quadrada.Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'}
           ]},
-      5: { label: '5) Livro Impresso + Ebook (PDF/EPUB/MOBI) + Distribuição', options: [
-            {key:'5-500-eco', label:'500 ex. (Qualidade Econômica)', total: 17134.41, material:'Econômico: 150 págs., capa 2 cores (P&B), gramagem básica + eBook (PDF/EPUB/MOBI).'},
-            {key:'5-1000-pre', label:'1.000 ex. (Qualidade Premium)', total: 19937.61, material:'Premium: 176 págs., Triplex 250 g 4x4, Offset 90 g, BOPP fosca + eBook (PDF/EPUB/MOBI).'}
+      5: { label: '5. Impresso + Ebook (PDF, EPUB e MOBI) + Distribuição Digital', options: [
+            {key:'5-500-eco', label:'500 exemplares (Qualidade Econômica)', total: 17134.41, material:'Econômico: 150 págs., capa 2 cores (P&B), gramagem básica. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'},
+            {key:'5-1000-pre', label:'1.000 exemplares (Qualidade Premium)', total: 19937.61, material:'Premium: 160 págs., Triplex 250 g 4x4, Offset 90 g, BOPP fosca. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'}
           ]},
-      6: { label: '6) Livro Impresso + Ebook (PDF/EPUB/MOBI) + Audiobook + Distribuição', options: [
-            {key:'6-500-eco', label:'500 ex. (Qualidade Econômica)', total: 20025.00, material:'Econômico: 150 págs., 2 cores; gramagem básica + eBook + audiobook (3–5h).'},
-            {key:'6-1000-any', label:'1.000 ex. (Econômica ou Premium)', total: 22069.63, material:'Especificação conforme aprovação (econômica ou premium) + eBook + audiobook (3–5h).'}
+      6: { label: '6. Livro Impresso + Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital', options: [
+            {key:'6-500-eco', label:'500 exemplares (Qualidade Econômica)', total: 20025.00, material:'Econômico: 150 págs., 2 cores; gramagem básica. Audiobook (3–5h). Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'},
+            {key:'6-1000-any', label:'1.000 exemplares (Qualidade Premium)', total: 22069.63, material:'Premium: 160 págs., Triplex 250 g 4x4, Offset 90 g, BOPP fosca. Audiobook (3–5h). Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'}
           ]}
     };
 
@@ -635,7 +639,7 @@
 
     // Inicialização
     const defaultPixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO1l2bQAAAAASUVORK5CYII=';
-    el('logoBase64').value = defaultPixel;
+    el('logoBase64').value = defaultPixel; // mantém a logo 1 como opcional (transparente), sem “quadro vazio”
     applyLogos();
     buildSuboptions();
     headerInfoToPreview();
