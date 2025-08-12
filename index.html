@@ -67,9 +67,9 @@
 
     .doc-obs { border:1px dashed #b9bec7; min-height:80px; padding:10px; white-space: pre-wrap; margin-top:10px; border-radius:4px; }
 
-    .doc-footer { border-top:1px solid var(--line); padding-top:8px; margin-top:10px; font-size:11px; color:#555; text-align:center; }
+    .doc-footer { border-top:1px solid var(--line); padding-top:8px; margin-top:10px; font-size:11px; color:#555; text-align:center; background:#fff; }
 
-    /* ===== Regras de quebra — NÃO dividir .orc-item ===== */
+    /* ===== Anti-quebra dos itens ===== */
     .orc-item,
     .orc-item table,
     .orc-item thead,
@@ -80,21 +80,58 @@
     .orc-item th {
       break-inside: avoid;
       page-break-inside: avoid;
+      -webkit-column-break-inside: avoid;
+      -webkit-region-break-inside: avoid;
     }
 
     /* Cabeçalhos/rodapés de tabela por página no print */
     thead { display: table-header-group; }
     tfoot { display: table-footer-group; }
 
-    /* @page e modo de impressão */
+    /* ===== PDF multipágina estável ===== */
     @page { size: A4; margin: 10mm; }
+
     @media print {
       header, .controls, .pager { display:none !important; }
       .rm { display:none !important; }
       body { background:#fff; }
-      .a4 { width:auto; height:auto; overflow:visible; border:0; padding:10mm; }
-      .orc-item { border:1px solid #e5e7eb; }
-      .doc-obs { border-color:#d1d5db; }
+      .a4 { 
+        width:auto; 
+        height:auto; 
+        overflow:visible; 
+        border:0; 
+        padding:10mm; 
+        padding-bottom:26mm; /* reserva espaço para rodapé fixo */
+      }
+
+      /* Reforço anti-quebra (mantém) */
+      .orc-item,
+      .orc-item table,
+      .orc-item thead,
+      .orc-item tbody,
+      .orc-item tfoot,
+      .orc-item tr,
+      .orc-item td,
+      .orc-item th {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        -webkit-column-break-inside: avoid;
+        -webkit-region-break-inside: avoid;
+      }
+
+      /* Rodapé repetido em TODAS as páginas */
+      .doc-footer {
+        position: fixed;
+        left: 10mm;
+        right: 10mm;
+        bottom: 10mm;
+        border-top:1px solid #e5e7eb;
+        padding-top:6px;
+        font-size:11px;
+        color:#555;
+        background:#fff;
+        z-index: 2;
+      }
     }
   </style>
 </head>
@@ -180,7 +217,7 @@
 
           <div class="btns">
             <!-- ÚNICO botão mantido -->
-            <button id="btnPrintAll" class="ghost">Salvar PDF (navegador)</button>
+            <button id="btnPrintAll" class="ghost" title="No diálogo de impressão, desmarque 'Cabeçalhos e rodapés'">Salvar PDF (navegador)</button>
             <button id="btnAddItem">Adicionar pacote</button>
             <button id="btnClearItems" class="soft">Limpar lista</button>
           </div>
@@ -270,7 +307,7 @@
 
           <div class="btns">
             <!-- ÚNICO botão mantido -->
-            <button id="btnPrint7" class="ghost">Salvar PDF (navegador)</button>
+            <button id="btnPrint7" class="ghost" title="No diálogo de impressão, desmarque 'Cabeçalhos e rodapés'">Salvar PDF (navegador)</button>
             <button id="btnAtualizar7">Atualizar prévia</button>
           </div>
         </div>
@@ -334,7 +371,7 @@
       }
     };
 
-    // Impressão nativa (melhor para quebras)
+    // Impressão nativa (com CSS embutido)
     function printAsVectorIframe(node, title) {
       const styleTag = document.querySelector('head style');
       const css = styleTag ? styleTag.innerHTML : '';
@@ -343,7 +380,7 @@
       clone.style.overflow = 'visible';
 
       const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>${title}</title><style>${css}
-@page{size:A4;margin:10mm;}@media print{header,.controls,.pager{display:none!important}body{background:#fff}.a4{width:auto;height:auto;overflow:visible;border:0;padding:10mm}}</style></head><body>${clone.outerHTML}</body></html>`;
+@page{size:A4;margin:10mm;}@media print{header,.controls,.pager{display:none!important}body{background:#fff}.a4{width:auto;height:auto;overflow:visible;border:0;padding:10mm;padding-bottom:26mm}.doc-footer{position:fixed;left:10mm;right:10mm;bottom:10mm;border-top:1px solid #e5e7eb;padding-top:6px;font-size:11px;color:#555;background:#fff;z-index:2}}</style></head><body>${clone.outerHTML}</body></html>`;
 
       const iframe = document.createElement('iframe');
       iframe.style.position = 'fixed';
@@ -409,7 +446,7 @@
 
     function headerInfoToPreview() {
       const empresa = el('empresa').value.trim() || '—';
-      const cnpj = el('cnpj').value.trim(); // opcional
+      const cnpj = el('cnpj').value.trim();
       el('empresaLinha').textContent = cnpj ? `${empresa} — ${cnpj}` : empresa;
       el('validadeLinha').textContent = `Validade: ${parseInt(el('validade').value || '30', 10)} dias`;
       el('kvTitulo').textContent = el('titulo').value.trim() || '—';
@@ -518,7 +555,7 @@
       printAsVectorIframe(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}`);
     });
 
-    // Atualizar prévia
+    // Atualizar prévia e selecionar todos
     document.getElementById('btnAtualizar7').addEventListener('click', renderServicos);
     document.getElementById('selTodos7').addEventListener('change', (e) => { const on = e.target.checked; document.querySelectorAll('.svcChk7').forEach(cb => cb.checked = on); renderServicos(); });
 
@@ -534,7 +571,8 @@
       const f = ev.target.files?.[0]; if (!f) return;
       const reader = new FileReader();
       reader.onload = () => {
-        const src = reader.result; el('pdfLogo2').src = src; el('pdfLogo2_top').src = src; el('pdfLogo2_serv').src = src; updatePager('principal'); updatePager('servicos');
+        const src = reader.result; el('pdfLogo2').src = src; el('pdfLogo2_top').src = src; el('pdfLogo2_serv').src = src;
+        updatePager('principal'); updatePager('servicos');
       };
       reader.readAsDataURL(f);
     });
