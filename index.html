@@ -207,12 +207,12 @@
 
           <label for="pacote">Pacote a adicionar</label>
           <select id="pacote">
-            <option value="1">1. Ebook (PDF, EPUB ou MOBI) SEM Distribuição Digital — R$ 1.200,00</option>
-            <option value="2">2. Ebook (PDF, EPUB e MOBI) + Distribuição Digital — R$ 1.500,00</option>
-            <option value="3">3. Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital — R$ 2.200,00</option>
-            <option value="4">4. Livro Impresso — Escolher abaixo</option>
-            <option value="5">5. Impresso + Ebook (PDF, EPUB e MOBI) + Distribuição Digital — Escolher abaixo</option>
-            <option value="6">6. Impresso + Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital — Escolher abaixo</option>
+            <option value="1">Ebook (PDF, EPUB ou MOBI) SEM Distribuição Digital — R$ 1.200,00</option>
+            <option value="2">Ebook (PDF, EPUB e MOBI) + Distribuição Digital — R$ 1.500,00</option>
+            <option value="3">Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital — R$ 2.200,00</option>
+            <option value="4">Livro Impresso — Escolher abaixo</option>
+            <option value="5">Impresso + Ebook (PDF, EPUB e MOBI) + Distribuição Digital — Escolher abaixo</option>
+            <option value="6">Impresso + Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital — Escolher abaixo</option>
           </select>
           <div id="suboptions"></div>
 
@@ -415,18 +415,18 @@
   <script>
     // ===================== DADOS PRINCIPAIS (1–6) =====================
     const PRICING = {
-      1: { label: '1. Ebook (PDF, EPUB e MOBI) SEM Distribuição Digital', total: 1200.00, material: 'Ebook (PDF); revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais.' },
-      2: { label: '2. Ebook (PDF, EPUB e MOBI) + Distribuição Digital', total: 1500.00, material: 'Ebook (PDF); revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.' },
-      3: { label: '3. Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital', total: 2200.00, material: 'Ebook (PDF, EPUB e MOBI); audiobook (3–5h); revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.' },
-      4: { label: '4. Livro Impresso', options: [
+      1: { label: 'Ebook (PDF, EPUB ou MOBI) SEM Distribuição Digital', total: 1200.00, material: 'Ebook (PDF); revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais.' },
+      2: { label: 'Ebook (PDF, EPUB e MOBI) + Distribuição Digital', total: 1500.00, material: 'Ebook (PDF); revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.' },
+      3: { label: 'Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital', total: 2200.00, material: 'Ebook (PDF, EPUB e MOBI); audiobook (3–5h); revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.' },
+      4: { label: 'Livro Impresso', options: [
             {key:'4-500-eco', label:'500 exemplares (Qualidade Econômica)', total: 11827.47, material:'Econômico: 150 págs., capa 2 cores (P&B), gramagem básica. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais.'},
             {key:'4-500-pre', label:'1.000 exemplares (Qualidade Premium)', total: 15514.37, material:'Premium: 160 págs., capa Triplex 250 g 4x4, miolo Offset 90 g, BOPP fosca, lombada quadrada. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'}
           ]},
-      5: { label: '5. Impresso + Ebook (PDF, EPUB e MOBI) + Distribuição Digital', options: [
+      5: { label: 'Impresso + Ebook (PDF, EPUB e MOBI) + Distribuição Digital', options: [
             {key:'5-500-eco', label:'500 exemplares (Qualidade Econômica)', total: 17134.41, material:'Econômico: 150 págs., capa 2 cores (P&B), gramagem básica. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'},
             {key:'5-1000-pre', label:'1.000 exemplares (Qualidade Premium)', total: 19937.61, material:'Premium: 160 págs., Triplex 250 g 4x4, Offset 90 g, BOPP fosca. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'}
           ]},
-      6: { label: '6. Livro Impresso + Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital', options: [
+      6: { label: 'Livro Impresso + Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital', options: [
             {key:'6-500-eco', label:'500 exemplares (Qualidade Econômica)', total: 20025.00, material:'Econômico: 150 págs., 2 cores; gramagem básica. Audiobook (3–5h). Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'},
             {key:'6-1000-any', label:'1.000 exemplares (Qualidade Premium)', total: 22069.63, material:'Premium: 160 págs., Triplex 250 g 4x4, Offset 90 g, BOPP fosca. Audiobook (3–5h). Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'}
           ]}
