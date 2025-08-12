@@ -34,7 +34,7 @@
 
     /* ===== A4 PREVIEW (fixo) ===== */
     .a4-wrap { display:flex; justify-content:center; }
-    .a4 { width:794px; min-height:1123px; background:#fff; border:1px solid var(--line); padding:18px; }
+    .a4 { width:794px; min-height:1123px; background:#fff; border:1px solid var(--line); padding:18px; display:flex; flex-direction:column; }
 
     .doc-header { display:flex; align-items:center; gap:16px; border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:10px; }
     .doc-header .logos img { width:70px; height:70px; }
@@ -56,6 +56,8 @@
     .rm { position:absolute; top:8px; right:8px; font-size:12px; padding:4px 8px; border:1px solid #ccc; background:#fff; cursor:pointer; }
 
     .doc-obs { border:1px solid #bbb; min-height:80px; padding:10px; white-space: pre-wrap; margin-top:10px; }
+
+    .doc-footer { border-top:1px solid var(--line); padding-top:8px; margin-top:10px; font-size:11px; color:#555; text-align:center; page-break-inside: avoid; break-inside: avoid; }
 
     /* ===== PDF multipágina estável ===== */
     thead { display: table-header-group; }
@@ -176,6 +178,7 @@
             <div id="items"></div>
             <div style="margin-top:8px"><strong>Descrição / Observações gerais:</strong></div>
             <div id="obsDocPreview" class="doc-obs"></div>
+            <div class="doc-footer">KCM Audiovisual • Emerson Mas • Contato: (83) 99689‑3360</div>
           </div>
         </div>
       </div>
@@ -266,6 +269,7 @@
               </tfoot>
             </table>
             <p class="muted" id="obsLinha7" style="margin-top:10px"></p>
+            <div class="doc-footer">KCM Audiovisual • Emerson Mas • Contato: (83) 99689‑3360</div>
           </div>
         </div>
       </div>
