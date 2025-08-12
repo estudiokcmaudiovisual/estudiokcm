@@ -59,7 +59,7 @@
     tfoot td { font-weight:bold; background:#fafafa; }
     .muted { color:var(--muted); font-size:11px; }
 
-    .orc-item { border:1px solid var(--line); padding:10px; margin: 10px 0; background:#fff; position:relative; /* permitir dividir item entre páginas */ break-inside:auto; }
+    .orc-item { border:1px solid var(--line); padding:10px; margin: 10px 0; background:#fff; position:relative; break-inside:auto; }
     .orc-item h4 { margin:0 0 8px 0; font-size:13px; letter-spacing:.2px; }
     .rm { position:absolute; top:8px; right:8px; font-size:12px; padding:4px 8px; border:1px solid #ccc; background:#fff; cursor:pointer; border-radius:4px; }
 
@@ -70,7 +70,6 @@
     /* ===== PDF multipágina estável ===== */
     thead { display: table-header-group; }
     tfoot { display: table-footer-group; }
-    /* permitir quebra natural de linhas/itens e manter cabeçalhos/tabelas legíveis */
     table, tr, td, th, .doc-header, .kv { page-break-inside: auto; break-inside: auto; }
 
     @page { size: A4; margin: 10mm; }
@@ -78,7 +77,6 @@
       header, .controls, .pager { display:none !important; }
       body { background:#fff; }
       .a4 { width:auto; height:auto; overflow:visible; border:0; padding:10mm; }
-      /* paginação visual mais elegante no PDF */
       .orc-item { border:1px solid #e5e7eb; }
       .doc-obs { border-color:#d1d5db; }
     }
@@ -92,7 +90,7 @@
     </div>
     <div class="header-text">
       <h1>Calculadora de Orçamento – Multi‑pacotes</h1>
-      <div class="sub">Pré‑visualização fixa em A4 com paginação. Pacotes 1–6 empilhados + Serviços (7) separado. Logo 1 (BASE64) + Logo 2 (upload).</div>
+      <div class="sub">Pré‑visualização A4 com paginação. Pacotes 1–6 empilhados + Serviços (7) separado. Logo 1 (BASE64) + Logo 2 (upload).</div>
     </div>
   </header>
 
@@ -167,8 +165,8 @@
           <div class="btns">
             <button id="btnAddItem">Adicionar pacote</button>
             <button id="btnClearItems" class="soft">Limpar lista</button>
-            <button id="btnPrintAll" class="ghost">Gerar PDF (vetorial – recomendado)</button>
-            <button id="btnPDFall" class="secondary">Gerar PDF (imagem – compatível)</button>
+            <button id="btnVectorAll" class="ghost">Baixar PDF (vetorial – recomendado)</button>
+            <button id="btnPDFall" class="secondary">Baixar PDF (imagem – compatível)</button>
           </div>
         </div>
 
@@ -256,8 +254,8 @@
 
           <div class="btns">
             <button id="btnAtualizar7">Atualizar</button>
-            <button id="btnPrint7" class="ghost">Gerar PDF (vetorial – recomendado)</button>
-            <button id="btnPDF7" class="secondary">Gerar PDF (imagem – compatível)</button>
+            <button id="btnVector7" class="ghost">Baixar PDF (vetorial – recomendado)</button>
+            <button id="btnPDF7" class="secondary">Baixar PDF (imagem – compatível)</button>
           </div>
         </div>
 
@@ -308,7 +306,7 @@
     </section>
   </main>
 
-  <!-- libs: html2pdf com fallback + espera imagens -->
+  <!-- libs: html2pdf e jsPDF + helpers -->
   <script>
     function ensureHtml2pdf() {
       return new Promise((resolve) => {
@@ -320,7 +318,23 @@
           const s2 = document.createElement('script');
           s2.src = 'https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js';
           s2.onload = () => resolve();
-          s2.onerror = () => { alert('Não foi possível carregar a biblioteca de PDF. Verifique a conexão.'); };
+          s2.onerror = () => { alert('Não foi possível carregar a biblioteca de PDF (imagem).'); };
+          document.body.appendChild(s2);
+        };
+        document.body.appendChild(s);
+      });
+    }
+    function ensureJsPDF() {
+      return new Promise((resolve) => {
+        if (window.jspdf && window.jspdf.jsPDF) return resolve();
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s.onload = () => resolve();
+        s.onerror = () => {
+          const s2 = document.createElement('script');
+          s2.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
+          s2.onload = () => resolve();
+          s2.onerror = () => { alert('Não foi possível carregar a biblioteca de PDF (vetorial).'); };
           document.body.appendChild(s2);
         };
         document.body.appendChild(s);
@@ -334,17 +348,47 @@
   </script>
 
   <script>
-    // ===== Util: impressão vetorial em nova janela (usa o MESMO CSS e DOM) =====
-    function printVector(node, title) {
-      // clona o nó para manter a prévia intacta
+    const el = (id) => document.getElementById(id);
+    const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    // ====== Vetorial via jsPDF.html (download sem pop‑up) ======
+    async function downloadVectorFrom(node, filename) {
+      await ensureJsPDF();
+      const { jsPDF } = window.jspdf;
+      // Clona o nó e remove o overflow fixo para caber inteiro
       const clone = node.cloneNode(true);
-      const styleTag = document.querySelector('head style');
-      const css = styleTag ? styleTag.innerHTML : '';
-      const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>${title}</title><style>${css}\n@media screen { .a4{width:794px;min-height:1123px;} }\n@media print { header,.controls,.pager{display:none!important} body{background:#fff;} .a4{width:auto;height:auto;overflow:visible;border:0;padding:10mm;} }</style></head><body>${clone.outerHTML}</body></html>`;
-      const w = window.open('', '_blank', 'noopener,noreferrer');
-      if (!w) { alert('Permita pop-ups para gerar o PDF.'); return; }
-      w.document.open(); w.document.write(html); w.document.close();
-      w.onload = () => { w.focus(); w.print(); };
+      clone.style.height = 'auto';
+      clone.style.overflow = 'visible';
+      // Envolve em um container com a mesma largura da prévia A4
+      const wrap = document.createElement('div');
+      wrap.style.width = '794px';
+      wrap.appendChild(clone);
+      // Garante que logos estejam carregadas
+      await waitForImages(wrap);
+      // Conversão: dimensões em pontos (A4: 595.28 x 841.89 pt) com margens de 28.35 pt (10mm)
+      const margin = 28.35;
+      const pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
+      await pdf.html(wrap, {
+        x: margin,
+        y: margin,
+        width: 595.28 - margin * 2,
+        windowWidth: 794,
+        autoPaging: 'text',
+        html2canvas: { scale: 1.2, useCORS: true, letterRendering: true },
+        callback: (doc) => doc.save(filename)
+      });
+    }
+
+    // ====== Compatibilidade (imagem) ======
+    async function downloadImageBasedFrom(node, filename) {
+      await ensureHtml2pdf();
+      await waitForImages(node);
+      const opt = { margin:[10,10,10,10], filename, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true,scrollY:0,letterRendering:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
+      // expande temporariamente
+      const prevH = node.style.height, prevO = node.style.overflow, prevST = node.scrollTop;
+      node.style.height = 'auto'; node.style.overflow = 'visible'; node.scrollTop = 0;
+      await window.html2pdf().set(opt).from(node).save();
+      node.style.height = prevH; node.style.overflow = prevO; node.scrollTop = prevST;
     }
   </script>
 
@@ -367,9 +411,6 @@
             {key:'6-1000-any', label:'1.000 ex. (Econômica ou Premium)', total: 22069.63, material:'Especificação conforme aprovação (econômica ou premium) + eBook + audiobook (3–5h).'}
           ]}
     };
-
-    const el = (id) => document.getElementById(id);
-    const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
     function buildSuboptions() {
       const p = parseInt(el('pacote').value, 10);
@@ -445,27 +486,16 @@
       }
     });
 
-    function withExpandedNode(node, fn) {
-      const prevH = node.style.height, prevO = node.style.overflow, prevST = node.scrollTop;
-      node.style.height = 'auto'; node.style.overflow = 'visible'; node.scrollTop = 0;
-      return Promise.resolve(fn()).finally(() => { node.style.height = '1123px'; node.style.overflow = 'auto'; node.scrollTop = prevST; });
-    }
-
-    // ===== Exportação: imagem (compatibilidade) =====
-    async function genPDFAll() {
-      headerInfoToPreview();
-      await ensureHtml2pdf();
+    // ===== Exportações =====
+    async function genPDFAll_image() {
       const node = document.getElementById('a4-principal');
-      await waitForImages(node);
-      const opt = { margin:[10,10,10,10], filename:`Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true,scrollY:0,letterRendering:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
-      await withExpandedNode(node, () => window.html2pdf().set(opt).from(node).save());
-    }
-
-    // ===== Exportação: vetorial (recomendado) =====
-    function printAllVector() {
       headerInfoToPreview();
+      await downloadImageBasedFrom(node, `Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+    async function genPDFAll_vector() {
       const node = document.getElementById('a4-principal');
-      printVector(node, `Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}`);
+      headerInfoToPreview();
+      await downloadVectorFrom(node, `Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}.pdf`);
     }
 
     // ===================== SERVIÇOS (7) =====================
@@ -524,9 +554,9 @@
       reader.readAsDataURL(f);
     });
 
-    // ===================== Pager (corrigido) =====================
+    // ===================== Pager (ajustado) =====================
     function pageMetrics(box) {
-      const step = box.clientHeight || 1123; // altura visível da A4
+      const step = Math.round(box.clientHeight) || 1123; // altura visível da A4
       const total = Math.max(1, Math.ceil(box.scrollHeight / step));
       return { step, total };
     }
@@ -539,8 +569,8 @@
       const next = which === 'principal' ? el('next-principal') : el('next-servicos');
       if (!box) return;
       const { step, total } = pageMetrics(box);
-      if (total > 1) pager.style.display = 'flex'; else pager.style.display = 'none';
-      let idx = Math.floor(((box.scrollTop || 0) + 1) / step);
+      pager.style.display = total > 1 ? 'flex' : 'none';
+      let idx = Math.floor(((box.scrollTop || 0) + 2) / step);
       idx = Math.max(0, Math.min(idx, total - 1));
       box.dataset.pageIndex = String(idx);
       info.textContent = `Página ${idx + 1} de ${total}`;
@@ -555,8 +585,7 @@
       const top = Math.min(idx * step, box.scrollHeight - step);
       box.dataset.pageIndex = String(idx);
       box.scrollTo({ top, behavior: 'smooth' });
-      // atualiza após a animação
-      setTimeout(() => updatePager(which), 320);
+      setTimeout(() => updatePager(which), 350);
     }
 
     function bindScrollPager(which) {
@@ -569,13 +598,25 @@
     el('pacote').addEventListener('change', buildSuboptions);
     el('btnAddItem').addEventListener('click', addItem);
     el('btnClearItems').addEventListener('click', () => { el('items').innerHTML=''; itemCount=0; updatePager('principal'); });
-    el('btnPDFall').addEventListener('click', genPDFAll);
-    el('btnPrintAll').addEventListener('click', printAllVector);
+
+    // Download: imagem e vetorial (sem pop‑up)
+    el('btnPDFall').addEventListener('click', () => genPDFAll_image());
+    el('btnVectorAll').addEventListener('click', () => genPDFAll_vector());
 
     document.getElementById('selTodos7').addEventListener('change', (e) => { const on = e.target.checked; document.querySelectorAll('.svcChk7').forEach(cb => cb.checked = on); renderServicos(); });
     document.getElementById('btnAtualizar7').addEventListener('click', renderServicos);
-    document.getElementById('btnPDF7').addEventListener('click', async () => { const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; } await ensureHtml2pdf(); const node = document.getElementById('a4-servicos'); await waitForImages(node); const opt = { margin:[10,10,10,10], filename:`Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true,scrollY:0,letterRendering:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} }; await withExpandedNode(node, () => window.html2pdf().set(opt).from(node).save()); });
-    document.getElementById('btnPrint7').addEventListener('click', () => { if (!renderServicos()) { alert('Selecione ao menos um serviço.'); return; } const node = document.getElementById('a4-servicos'); printVector(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}`); });
+
+    // Serviços: geração dos dois tipos
+    document.getElementById('btnPDF7').addEventListener('click', async () => {
+      const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; }
+      const node = document.getElementById('a4-servicos');
+      await downloadImageBasedFrom(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`);
+    });
+    document.getElementById('btnVector7').addEventListener('click', async () => {
+      if (!renderServicos()) { alert('Selecione ao menos um serviço.'); return; }
+      const node = document.getElementById('a4-servicos');
+      await downloadVectorFrom(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`);
+    });
 
     el('prev-principal').addEventListener('click', () => goToPage('principal', -1));
     el('next-principal').addEventListener('click', () => goToPage('principal', 1));
