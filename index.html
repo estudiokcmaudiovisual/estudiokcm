@@ -77,6 +77,12 @@
     @page { size: A4; margin: 10mm; }
     @media print {
       header, .controls, .pager { display:none !important; }
+      .rm { display:none !important; }
+      body { background:#fff; }
+      .a4 { width:auto; height:auto; overflow:visible; border:0; padding:10mm; }
+      .orc-item { border:1px solid #e5e7eb; }
+      .doc-obs { border-color:#d1d5db; }
+    }
       body { background:#fff; }
       .a4 { width:auto; height:auto; overflow:visible; border:0; padding:10mm; }
       .orc-item { border:1px solid #e5e7eb; }
@@ -167,7 +173,8 @@
           <div class="btns">
             <button id="btnAddItem">Adicionar pacote</button>
             <button id="btnClearItems" class="soft">Limpar lista</button>
-            <button id="btnVectorAll" class="ghost">Baixar PDF (vetorial – recomendado)</button>
+            <button id="btnPrintAll" class="ghost">Imprimir/Salvar PDF (vetorial – recomendado)</button>
+            <button id="btnVectorAll" class="ghost">Baixar PDF (vetorial – jsPDF)</button>
             <button id="btnPDFall" class="secondary">Baixar PDF (imagem – compatível)</button>
           </div>
         </div>
@@ -256,7 +263,8 @@
 
           <div class="btns">
             <button id="btnAtualizar7">Atualizar</button>
-            <button id="btnVector7" class="ghost">Baixar PDF (vetorial – recomendado)</button>
+            <button id="btnPrint7" class="ghost">Imprimir/Salvar PDF (vetorial – recomendado)</button>
+            <button id="btnVector7" class="ghost">Baixar PDF (vetorial – jsPDF)</button>
             <button id="btnPDF7" class="secondary">Baixar PDF (imagem – compatível)</button>
           </div>
         </div>
@@ -368,6 +376,47 @@
       const imgs = Array.from(root.querySelectorAll('img'));
       if (imgs.length === 0) return Promise.resolve();
       return Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = res; })));
+    }
+  </script>
+
+  <script>
+    // ====== Vetorial nativo via IFRAME oculto (sem pop‑up, mesma formatação da prévia) ======
+    function printAsVectorIframe(node, title) {
+      const styleTag = document.querySelector('head style');
+      const css = styleTag ? styleTag.innerHTML : '';
+      // Clona o conteúdo do A4 e remove scroll/altura fixa para imprimir tudo
+      const clone = node.cloneNode(true);
+      clone.style.height = 'auto';
+      clone.style.overflow = 'visible';
+
+      const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>${title}</title><style>${css}
+@page{size:A4;margin:10mm;}@media print{header,.controls,.pager{display:none!important}body{background:#fff}.a4{width:auto;height:auto;overflow:visible;border:0;padding:10mm}}
+</style></head><body>${clone.outerHTML}</body></html>`;
+
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
+
+      const cleanup = () => setTimeout(() => iframe.remove(), 1000);
+      iframe.onload = () => {
+        const iw = iframe.contentWindow;
+        const idoc = iw.document;
+        const imgs = Array.from(idoc.images);
+        let pending = imgs.length;
+        const done = () => { iw.focus(); iw.print(); cleanup(); };
+        if (pending === 0) return done();
+        imgs.forEach(img => {
+          if (img.complete) { if (--pending === 0) done(); }
+          else { img.onload = img.onerror = () => { if (--pending === 0) done(); }; }
+        });
+      };
+      // Usa srcdoc para evitar políticas de pop-up
+      iframe.srcdoc = html;
     }
   </script>
 
@@ -626,23 +675,29 @@
     el('btnAddItem').addEventListener('click', addItem);
     el('btnClearItems').addEventListener('click', () => { el('items').innerHTML=''; itemCount=0; updatePager('principal'); });
 
-    // Download: imagem e vetorial (sem pop‑up)
-    el('btnPDFall').addEventListener('click', () => genPDFAll_image());
+    // Download/Impressão: três modos
+    el('btnPrintAll').addEventListener('click', () => { const node = document.getElementById('a4-principal'); headerInfoToPreview(); printAsVectorIframe(node, `Orcamentos_Pacotes_${new Date().toISOString().slice(0,10)}`); });
     el('btnVectorAll').addEventListener('click', () => genPDFAll_vector());
+    el('btnPDFall').addEventListener('click', () => genPDFAll_image());
 
     document.getElementById('selTodos7').addEventListener('change', (e) => { const on = e.target.checked; document.querySelectorAll('.svcChk7').forEach(cb => cb.checked = on); renderServicos(); });
     document.getElementById('btnAtualizar7').addEventListener('click', renderServicos);
 
-    // Serviços: geração dos dois tipos
-    document.getElementById('btnPDF7').addEventListener('click', async () => {
-      const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; }
+    // Serviços: três modos
+    document.getElementById('btnPrint7').addEventListener('click', () => {
+      if (!renderServicos()) { alert('Selecione ao menos um serviço.'); return; }
       const node = document.getElementById('a4-servicos');
-      await downloadImageBasedFrom(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`);
+      printAsVectorIframe(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}`);
     });
     document.getElementById('btnVector7').addEventListener('click', async () => {
       if (!renderServicos()) { alert('Selecione ao menos um serviço.'); return; }
       const node = document.getElementById('a4-servicos');
       await downloadVectorFrom(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`);
+    });
+    document.getElementById('btnPDF7').addEventListener('click', async () => {
+      const any = renderServicos(); if (!any) { alert('Selecione ao menos um serviço.'); return; }
+      const node = document.getElementById('a4-servicos');
+      await downloadImageBasedFrom(node, `Orcamento_Servicos_${new Date().toISOString().slice(0,10)}.pdf`);
     });
 
     el('prev-principal').addEventListener('click', () => goToPage('principal', -1));
