@@ -308,7 +308,7 @@
     </section>
   </main>
 
-  <!-- libs: html2pdf e jsPDF + helpers -->
+  <!-- libs: html2pdf e jsPDF + helpers (sem duplicações) -->
   <script>
     function ensureHtml2pdf() {
       return new Promise((resolve) => {
@@ -363,11 +363,6 @@
         };
         document.body.appendChild(s);
       });
-    };
-          document.body.appendChild(s2);
-        };
-        document.body.appendChild(s);
-      });
     }
     function waitForImages(root) {
       const imgs = Array.from(root.querySelectorAll('img'));
@@ -378,7 +373,14 @@
 
   <script>
     const el = (id) => document.getElementById(id);
-    const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const fmt = (v) => {
+      const n = Number(v) || 0;
+      try {
+        return new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(n);
+      } catch (e) {
+        return 'R$ ' + n.toFixed(2).replace('.', ',');
+      }
+    };
 
     // ====== Vetorial via jsPDF.html (download sem pop‑up) ======
     async function downloadVectorFrom(node, filename) {
@@ -403,29 +405,6 @@
         html2canvas: { scale: 1.25, useCORS: true, letterRendering: true },
         callback: (doc) => doc.save(filename)
       });
-    } = window.jspdf;
-      // Clona o nó e remove o overflow fixo para caber inteiro
-      const clone = node.cloneNode(true);
-      clone.style.height = 'auto';
-      clone.style.overflow = 'visible';
-      // Envolve em um container com a mesma largura da prévia A4
-      const wrap = document.createElement('div');
-      wrap.style.width = '794px';
-      wrap.appendChild(clone);
-      // Garante que logos estejam carregadas
-      await waitForImages(wrap);
-      // Conversão: dimensões em pontos (A4: 595.28 x 841.89 pt) com margens de 28.35 pt (10mm)
-      const margin = 28.35;
-      const pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
-      await pdf.html(wrap, {
-        x: margin,
-        y: margin,
-        width: 595.28 - margin * 2,
-        windowWidth: 794,
-        autoPaging: 'text',
-        html2canvas: { scale: 1.2, useCORS: true, letterRendering: true },
-        callback: (doc) => doc.save(filename)
-      });
     }
 
     // ====== Compatibilidade (imagem) ======
@@ -433,7 +412,6 @@
       await ensureHtml2pdf();
       await waitForImages(node);
       const opt = { margin:[10,10,10,10], filename, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true,scrollY:0,letterRendering:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
-      // expande temporariamente
       const prevH = node.style.height, prevO = node.style.overflow, prevST = node.scrollTop;
       node.style.height = 'auto'; node.style.overflow = 'visible'; node.scrollTop = 0;
       await window.html2pdf().set(opt).from(node).save();
@@ -518,7 +496,7 @@
         <table>
           <thead><tr><th style="width:50%">Descrição</th><th style="width:25%">Detalhes</th><th style="width:25%">Valor (R$)</th></tr></thead>
           <tbody><tr><td>${tituloPacote}</td><td>${detalhes}</td><td class="money">${fmt(total)}</td></tr></tbody>
-          <tfoot><tr><td colspan="2" style="text-align:right">TOTAL</td><td>${fmt(total)}</td></tr></tfoot>
+          <tfoot><tr><td colspan="2" style="text-align:right">TOTAL</td><td class="money">${fmt(total)}</td></tr></tfoot>
         </table>
       `;
       el('items').appendChild(item);
@@ -577,7 +555,7 @@
         if (!cb.checked) return; any = true;
         const k = cb.getAttribute('data-key'); const s = SERVICOS[k]; if (!s) return;
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${s.nome}</td><td>${s.desc}</td><td>${(s.valor).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</td>`;
+        tr.innerHTML = `<td>${s.nome}</td><td>${s.desc}</td><td class="money">${fmt(s.valor)}</td>`;
         tbody.appendChild(tr); total += s.valor;
       });
       el('tdTotal7').textContent = fmt(total);
