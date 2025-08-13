@@ -414,23 +414,66 @@
 
   <script>
     // ===================== DADOS PRINCIPAIS (1–6) =====================
-    const PRICING = {
-      1: { label: 'Ebook (PDF, EPUB ou MOBI) SEM Distribuição Digital', total: 1200.00, material: 'Ebook (PDF); revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais.' },
-      2: { label: 'Ebook (PDF, EPUB e MOBI) + Distribuição Digital', total: 1500.00, material: 'Ebook (PDF); revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.' },
-      3: { label: 'Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital', total: 2200.00, material: 'Ebook (PDF, EPUB e MOBI); audiobook (3–5h); revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.' },
-      4: { label: 'Livro Impresso', options: [
-            {key:'4-500-eco', label:'500 exemplares', total: 11827.47, material:'150 págs, capa fosca simples, gramagem básica, 140x210 mm. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais.'},
-            {key:'4-500-pre', label:'1.000 exemplares', total: 15514.37, material:'160 págs, capa fosca simples, gramagem básica, 140x210 mm. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'}
-          ]},
-      5: { label: 'Impresso + Ebook (PDF, EPUB e MOBI) + Distribuição Digital', options: [
-            {key:'5-500-eco', label:'500 exemplares', total: 17134.41, material:'150 págs, capa fosca simples, gramagem básica, 140x210 mm. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'},
-            {key:'5-1000-pre', label:'1.000 exemplares', total: 19937.61, material:'160 págs, capa fosca simples, gramagem básica, 140x210 mm. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'}
-          ]},
-      6: { label: 'Livro Impresso + Ebook (PDF, EPUB e MOBI) + Audiobook + Distribuição Digital', options: [
-            {key:'6-500-eco', label:'500 exemplares', total: 20025.00, material:'150 págs, capa fosca simples, gramagem básica, 140x210 mm. Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'},
-            {key:'6-1000-any', label:'1.000 exemplares', total: 22069.63, material:'160 págs, capa fosca simples, gramagem básica, 140x210 mm. Audiobook (3–5h). Ebook (PDF); copidesque; revisão; preparação textual; diagramação; capa e contracapa; conversão para EPUB e MOBI; ficha/ISBN; registro de direitos autorais; distribuição digital.'}
-          ]}
-    };
+    // ===================== DADOS PRINCIPAIS (1–6) =====================
+const PRICING = {
+  1: { label: '1) Ebook (PDF) + Distribuição Digital',
+       total: 1200.00,
+       material: 'Ebook (PDF); capa frente; revisão; ficha/ISBN; distribuição digital.' },
+
+  2: { label: '2) Ebook (PDF + EPUB/MOBI) + Distribuição Digital',
+       total: 1500.00,
+       material: 'Ebook PDF + EPUB/MOBI; capa frente; revisão; ficha/ISBN; distribuição digital.' },
+
+  3: { label: '3) Ebook (PDF + Audiobook) + Distribuição Digital',
+       total: 2200.00,
+       material: 'Ebook (PDF) + audiobook (3–5h); capa frente; revisão; ficha/ISBN; distribuição digital.' },
+
+  4: { label: '4) Livro Impresso (serviços editoriais completos)',
+       options: [
+         { key:'4-500-eco',
+           label:'500 ex. (Qualidade Econômica)',
+           total: 11827.47,
+           material:'Econômico: 150 págs., capa 2 cores (P&B), gramagem básica.' },
+
+         { key:'4-500-pre',
+           label:'500 ex. (Qualidade Premium)',
+           total: 15514.37,
+           material:'Premium: 176 págs., capa Triplex 250 g 4x4, miolo Offset 90 g, BOPP fosca, lombada quadrada.' },
+
+         /* NOVO conforme solicitado */
+         { key:'4-1000',
+           label:'1.000 exemplares',
+           total: 17726.55,
+           material:'Especificações a confirmar conforme aprovação final (capa/miolo).'}
+       ]},
+
+  5: { label: '5) Livro Impresso + Ebook (PDF/EPUB/MOBI) + Distribuição',
+       options: [
+         { key:'5-500-eco',
+           label:'500 ex. (Qualidade Econômica)',
+           total: 17134.41,
+           material:'Econômico: 150 págs., capa 2 cores (P&B), gramagem básica + eBook (PDF/EPUB/MOBI).' },
+
+         /* ATUALIZADO conforme solicitado */
+         { key:'5-1000',
+           label:'1.000 exemplares',
+           total: 19346.59,
+           material:'Impresso + eBook (PDF, EPUB e MOBI) + distribuição digital; especificações conforme aprovação.' }
+       ]},
+
+  6: { label: '6) Livro Impresso + Ebook (PDF/EPUB/MOBI) + Audiobook + Distribuição',
+       options: [
+         { key:'6-500-eco',
+           label:'500 ex. (Qualidade Econômica)',
+           total: 20025.00,
+           material:'Econômico: 150 págs., 2 cores; gramagem básica + eBook + audiobook (3–5h).' },
+
+         { key:'6-1000-any',
+           label:'1.000 ex. (Econômica ou Premium)',
+           total: 22069.63,
+           material:'Especificação conforme aprovação (econômica ou premium) + eBook + audiobook (3–5h).' }
+       ]}
+};
 
     function buildSuboptions() {
       const p = parseInt(el('pacote').value, 10);
