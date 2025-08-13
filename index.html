@@ -415,62 +415,58 @@
   <script>
     // ===================== DADOS PRINCIPAIS (1–6) =====================
 const PRICING = {
-  1: { label: 'Ebook (PDF) + Distribuição Digital',
+  1: { label: 'Ebook em PDF, EPUB e MOBI (básico) e Distribuição Digital',
        total: 1200.00,
-       material: 'Ebook (PDF); capa frente; revisão; ficha/ISBN; distribuição digital.' },
+       material: 'Ebook no formato PDF; Revisão ortográfica e gramatical; Preparação textual; Diagramação para PDF (digital); Capa (frente - versão eBook); Ficha catalográfica e ISBN; Registro de direitos autorais; Distribuição digital.' },
 
-  2: { label: 'Ebook (PDF + EPUB/MOBI) + Distribuição Digital',
+  2: { label: 'Ebook no PDF, EPUB e MOBI (padrão) e Distribuição Digital',
        total: 1500.00,
-       material: 'Ebook PDF + EPUB/MOBI; capa frente; revisão; ficha/ISBN; distribuição digital.' },
+       material: 'Ebook PDF, EPUB e MOBI; *Adaptação editorial*; Revisão ortográfica e gramatical; Preparação textual; Diagramação para PDF (digital); Capa (frente - versão eBook); Ficha catalográfica e ISBN; Registro de direitos autorais; Distribuição digital.' },
 
-  3: { label: 'Ebook (PDF + Audiobook) + Distribuição Digital',
+  3: { label: 'Ebook no PDF, EPUB e MOBI (padrão), Audibook e Distribuição Digital',
        total: 2200.00,
-       material: 'Ebook (PDF) + audiobook (3–5h) por IA; capa frente; revisão; ficha/ISBN; distribuição digital.' },
+       material: 'Ebook PDF, EPUB e MOBI; *Adaptação editorial*; Revisão ortográfica e gramatical; Preparação textual; Diagramação para PDF (digital); Capa (frente - versão eBook); Ficha catalográfica e ISBN; Registro de direitos autorais; Audiobook (3–5h) por IA; Distribuição digital.' },
 
   4: { label: 'Livro Impresso',
        options: [
-         { key:'4-500-eco',
-           label:'500 ex.',
-           total: 11827.47,
-           material:'150 págs, capa simples, gramagem básica, 140x210mm. ' },
 
          { key:'4-500-pre',
-           label:'500 ex.',
+           label:'500 exemplares',
            total: 15514.37,
-           material:'150 págs, capa simples, gramagem básica, 140x210mm.' },
+           material:'150 págs*, Capa fosca simples*, Gramagem básica*, 140x210mm. Copidesque, Revisão ortográfica e gramatical, Preparação textual, Diagramação, Criação de capa e contracapa, Ficha catalográfica e ISBN e Registro de direitos autorais.' },
 
          /* NOVO conforme solicitado */
          { key:'4-1000',
            label:'1.000 exemplares',
            total: 17726.55,
-           material:'160 págs, Capa simples, Gramagem básica, 140x210mm. Copidesque, Revisão ortográfica e gramatical, Preparação textual, Diagramação, Criação de capa e contracapa, Conversão para EPUB/MOBI, Ficha catalográfica e ISBN, Registro de direitos autorais.'}
+           material:'160 págs, Capa fosca simples*, Gramagem básica*, 140x210mm. Copidesque, Revisão ortográfica e gramatical, Preparação textual, Diagramação, Criação de capa e contracapa, Ficha catalográfica e ISBN e Registro de direitos autorais.'}
        ]},
 
-  5: { label: 'Livro Impresso + Ebook (PDF/EPUB/MOBI) + Distribuição Digital',
+  5: { label: 'Livro Impresso + Ebook nos formatos PDF, EPUB e MOBI com Distribuição Digital para o Ebook',
        options: [
          { key:'5-500-eco',
            label:'500 ex.',
            total: 17134.41,
-           material:'150 págs, capa simples, gramagem básica, 140x210mm + Ebook (PDF/EPUB/MOBI) + Distribuição Digital.' },
+           material:'150 págs*, Capa fosca simples*, Gramagem básica*, 140x210mm. Copidesque, Revisão ortográfica e gramatical, Preparação textual, Diagramação, Criação de capa e contracapa, Ficha catalográfica e ISBN e Registro de direitos autorais. Ebook nos formatos PDF, EPUB e MOBI) com Distribuição Digital para o Ebook.' },
 
          /* ATUALIZADO conforme solicitado */
          { key:'5-1000',
            label:'1.000 exemplares',
            total: 19346.59,
-           material:'160 págs, Capa simples, Gramagem básica, 140x210mm. Copidesque, Revisão ortográfica e gramatical, Preparação textual, Diagramação, Criação de capa e contracapa, Conversão para EPUB/MOBI, Ficha catalográfica e ISBN, Registro de direitos autorais. Ebook (PDF/EPUB/MOBI) e distribuição em plataformas digitais.' }
+           material:'160 págs, Capa fosca simples*, Gramagem básica*, 140x210mm. Copidesque, Revisão ortográfica e gramatical, Preparação textual, Diagramação, Criação de capa e contracapa, Ficha catalográfica e ISBN e Registro de direitos autorais. Ebook nos formatos PDF, EPUB e MOBI) com Distribuição Digital para o Ebook.' }
        ]},
 
-  6: { label: 'Livro Impresso + Ebook (PDF/EPUB/MOBI) + Audiobook + Distribuição Digital',
+  6: { label: 'Livro Impresso + Audiobook + Ebook nos formatos PDF, EPUB e MOBI com Distribuição Digital (para Ebook e Audiobook)',
        options: [
          { key:'6-500-eco',
            label:'500 ex.',
            total: 20025.00,
-           material:'Econômico: 150 págs, capa simples, gramagem básica, 140x210mm + Ebook (PDF/EPUB/MOBI) + audiobook (3–5h).' },
+           material:'150 págs*, Capa fosca simples*, Gramagem básica*, 140x210mm. Copidesque, Revisão ortográfica e gramatical, Preparação textual, Diagramação, Criação de capa e contracapa, Ficha catalográfica e ISBN e Registro de direitos autorais. Ebook nos formatos PDF, EPUB e MOBI) com Distribuição Digital para o Ebook. Audiobook (3–5h) por IA.' },
 
          { key:'6-1000-any',
            label:'1.000 ex.',
            total: 22069.63,
-           material:'160 págs, Capa simples, Gramagem básica, 140x210mm. Copidesque, Revisão ortográfica e gramatical, Preparação textual, Diagramação, Criação de capa e contracapa, Conversão para EPUB/MOBI, Ficha catalográfica e ISBN, Registro de direitos autorais. Ebook (PDF/EPUB/MOBI) e distribuição em plataformas digitais. Audiobook (3–5h) por IA.' }
+           material:'160 págs, Capa fosca simples*, Gramagem básica*, 140x210mm. Copidesque, Revisão ortográfica e gramatical, Preparação textual, Diagramação, Criação de capa e contracapa, Ficha catalográfica e ISBN e Registro de direitos autorais. Ebook nos formatos PDF, EPUB e MOBI) com Distribuição Digital para o Ebook. Audiobook (3–5h) por IA.' }
        ]}
 };
 
